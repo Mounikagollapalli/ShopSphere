@@ -60,6 +60,12 @@ Use the test payment details supplied in Razorpay's official Test Mode guidance.
 
 **Never put `RAZORPAY_KEY_SECRET` in React code, a `VITE_*` variable, GitHub, or Vercel frontend environment variables.** Keep it only in the payment backend's private environment settings.
 
+## Security and demo limitations
+- This project uses JSON Server as a learning/demo API. It is publicly readable/writable if deployed without access controls; do not store real customer information in it.
+- The current demo login stores passwords in the JSON Server data and compares them directly. It is not production authentication. Do not reuse a real password, and do not use this authentication flow for real customers.
+- Order creation, customer updates, and stock changes are initiated by the browser against JSON Server. They are not transactional and can be manipulated. A production system needs authenticated backend endpoints, password hashing, authorization, database transactions, and server-side order persistence.
+- Use only synthetic test accounts and test payment credentials in this repository. Keep personal data and all `.env` files out of Git.
+
 ## Deployment note
 Deploy `payment-server` as a separate Node service. Set `RAZORPAY_KEY_ID`, `RAZORPAY_KEY_SECRET`, `JSON_SERVER_URL`, and `FRONTEND_URL` in that service's environment settings. In Vercel, set `VITE_PAYMENT_API_URL` to the deployed payment API URL and `VITE_RAZORPAY_KEY_ID` to the Test Key ID, then redeploy.
 

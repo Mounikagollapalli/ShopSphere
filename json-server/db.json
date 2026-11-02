@@ -466,29 +466,10 @@
       "email": "kiran@mail.com",
       "phone": "9876500044",
       "joinedAt": "2026-09-28"
-    },
-    {
-      "name": "Gollapalli Mounika",
-      "email": "mounikagollapalli06@gmail.com",
-      "password": "Mounika@123",
-      "phone": "8121832648",
-      "joinedAt": "2026-11-01",
-      "id": "wNSOjAb"
     }
   ],
   "cart": [],
-  "wishlist": [
-    {
-      "userId": "wNSOjAb",
-      "productId": "31",
-      "id": 2
-    },
-    {
-      "userId": "wNSOjAb",
-      "productId": "4",
-      "id": 3
-    }
-  ],
+  "wishlist": [],
   "orders": [
     {
       "id": "1",
@@ -621,121 +602,6 @@
           "price": 3900
         }
       ]
-    },
-    {
-      "customerId": "wNSOjAb",
-      "date": "2026-11-01",
-      "status": "Delivered",
-      "total": 149900,
-      "items": [
-        {
-          "productId": "1",
-          "qty": 1,
-          "price": 149900
-        }
-      ],
-      "payment": "Cash on Delivery",
-      "shipping": {
-        "name": "Gollapalli Mounika",
-        "phone": "8121832648",
-        "address": "Mettuguda\nSecunderabad",
-        "city": "Hyderabad",
-        "pincode": "500017"
-      },
-      "id": "CEiljS1"
-    },
-    {
-      "customerId": "wNSOjAb",
-      "date": "2026-11-01",
-      "status": "Delivered",
-      "total": 99900,
-      "items": [
-        {
-          "productId": "5",
-          "qty": 1,
-          "price": 99900
-        }
-      ],
-      "payment": "UPI (demo)",
-      "shipping": {
-        "name": "Gollapalli Mounika",
-        "phone": "8121832648",
-        "address": "Lallaguda",
-        "city": "Secunderabad",
-        "pincode": "500017"
-      },
-      "id": "tJP9e4-"
-    },
-    {
-      "customerId": "wNSOjAb",
-      "date": "2026-11-01",
-      "status": "Cancelled",
-      "total": 54990,
-      "items": [
-        {
-          "productId": "30",
-          "qty": 1,
-          "price": 54990
-        }
-      ],
-      "payment": "Cash on Delivery",
-      "shipping": {
-        "name": "Gollapalli Mounika",
-        "phone": "8121832648",
-        "address": "Mettuguda\nSecunderabad",
-        "city": "Hyderabad",
-        "pincode": "500017"
-      },
-      "id": "MtT18SV"
-    },
-    {
-      "customerId": "wNSOjAb",
-      "date": "2026-11-01",
-      "status": "Cancelled",
-      "total": 8999,
-      "items": [
-        {
-          "productId": "24",
-          "qty": 1,
-          "price": 8999
-        }
-      ],
-      "payment": "Cash on Delivery",
-      "shipping": {
-        "name": "Gollapalli Mounika",
-        "phone": "8121832648",
-        "address": "Mettuguda\nSecunderabad",
-        "city": "Hyderabad",
-        "pincode": "500017"
-      },
-      "id": "R7YD6a_"
-    },
-    {
-      "customerId": "wNSOjAb",
-      "date": "2026-11-02",
-      "status": "Delivered",
-      "total": 243489,
-      "items": [
-        {
-          "productId": "ly_Eie8",
-          "qty": 1,
-          "price": 93490
-        },
-        {
-          "productId": "6",
-          "qty": 1,
-          "price": 149999
-        }
-      ],
-      "payment": "UPI (demo)",
-      "shipping": {
-        "name": "Gollapalli Mounika",
-        "phone": "8121832648",
-        "address": "Mettuguda\nSecunderabad",
-        "city": "Hyderabad",
-        "pincode": "500017"
-      },
-      "id": "jvW2z-y"
     }
   ]
 }

@@ -33,8 +33,8 @@
       "name": "Gaming"
     },
     {
-      "name": "Refrigerators",
-      "id": "SmkgaNA"
+      "id": "SmkgaNA",
+      "name": "Refrigerator"
     }
   ],
   "products": [
@@ -106,7 +106,7 @@
       "price": 149999,
       "discount": 9,
       "rating": 4.5,
-      "stock": 8,
+      "stock": 7,
       "description": "14.5 inch premium laptop for work and creativity.",
       "image": "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQv4apXsaS8CrbR83NHWC-C94YIFONDOQ0j4UcS4q0jzw&s=10"
     },
@@ -322,7 +322,7 @@
       "price": 8999,
       "discount": 22,
       "rating": 4.5,
-      "stock": 29,
+      "stock": 30,
       "description": "1TB portable SSD, 1050MB/s read speed.",
       "image": "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcT1Zg4SjP0383pwlQMiyigQhl7Wtvz8QJEPdlp8oRA0OA&s=10"
     },
@@ -394,7 +394,7 @@
       "price": 54990,
       "discount": 5,
       "rating": 4.7,
-      "stock": 8,
+      "stock": 9,
       "description": "4K gaming console with 1TB storage.",
       "image": "https://cms-assets.xboxservices.com/assets/5c/5b/5c5bf348-d948-4c48-b7cc-55aaf94f2782.png?n=642227_Hero-Gallery-0_B1_857x676.png"
     },
@@ -426,7 +426,7 @@
       "name": "Refrigerators",
       "categoryId": "SmkgaNA",
       "price": 93490,
-      "stock": 4,
+      "stock": 3,
       "image": "https://encrypted-tbn0.gstatic.com/shopping?q=tbn:ANd9GcSl_a5vMFN3nbmgpmwReU-thZaEF7GSgnXnqI4httyoXhEiL4KdIOzkbXwarlXWDN5JSNIIRnToNr9UYTRkEmVYpYm8225Qn6wIwbKGdP3KZTavqZ9MtL1Cm5-efmL6xjr87o1vVEc&usqp=CAc",
       "id": "ly_Eie8"
     }
@@ -478,11 +478,6 @@
   ],
   "cart": [],
   "wishlist": [
-    {
-      "userId": "wNSOjAb",
-      "productId": "5",
-      "id": 1
-    },
     {
       "userId": "wNSOjAb",
       "productId": "31",
@@ -674,7 +669,7 @@
     {
       "customerId": "wNSOjAb",
       "date": "2026-11-01",
-      "status": "Pending",
+      "status": "Cancelled",
       "total": 54990,
       "items": [
         {
@@ -696,7 +691,7 @@
     {
       "customerId": "wNSOjAb",
       "date": "2026-11-01",
-      "status": "Pending",
+      "status": "Cancelled",
       "total": 8999,
       "items": [
         {
@@ -714,6 +709,33 @@
         "pincode": "500017"
       },
       "id": "R7YD6a_"
+    },
+    {
+      "customerId": "wNSOjAb",
+      "date": "2026-11-02",
+      "status": "Delivered",
+      "total": 243489,
+      "items": [
+        {
+          "productId": "ly_Eie8",
+          "qty": 1,
+          "price": 93490
+        },
+        {
+          "productId": "6",
+          "qty": 1,
+          "price": 149999
+        }
+      ],
+      "payment": "UPI (demo)",
+      "shipping": {
+        "name": "Gollapalli Mounika",
+        "phone": "8121832648",
+        "address": "Mettuguda\nSecunderabad",
+        "city": "Hyderabad",
+        "pincode": "500017"
+      },
+      "id": "jvW2z-y"
     }
   ]
 }

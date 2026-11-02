@@ -69,22 +69,53 @@ app.post("/api/payments/create-order", async (req, res) => {
   }
 });
 
-app.post("/api/payments/verify", (req, res) => {
-  const { razorpay_order_id, razorpay_payment_id, razorpay_signature } = req.body;
-  const secret = process.env.RAZORPAY_KEY_SECRET;
-  if (!secret || !razorpay_order_id || !razorpay_payment_id || !razorpay_signature) {
-    return res.status(400).json({ verified: false, message: "Missing payment verification details." });
+app.post("/api/payments/verify", async (req, res) => {
+  try {
+    const { razorpay_order_id, razorpay_payment_id, razorpay_signature } = req.body;
+    const secret = process.env.RAZORPAY_KEY_SECRET;
+    if (!secret || !razorpay_order_id || !razorpay_payment_id || !razorpay_signature) {
+      return res.status(400).json({ verified: false, message: "Missing payment verification details." });
+    }
+
+    const signature = crypto.createHmac("sha256", secret)
+      .update(`${razorpay_order_id}|${razorpay_payment_id}`)
+      .digest("hex");
+    const a = Buffer.from(signature);
+    const b = Buffer.from(razorpay_signature);
+    const signatureValid = a.length === b.length && crypto.timingSafeEqual(a, b);
+
+    if (!signatureValid) {
+      return res.status(400).json({ verified: false, message: "Invalid payment signature." });
+    }
+
+    // Confirm with Razorpay that this payment belongs to the order and is captured.
+    const client = razorpayClient();
+    const [payment, order] = await Promise.all([
+      client.payments.fetch(razorpay_payment_id),
+      client.orders.fetch(razorpay_order_id),
+    ]);
+
+    if (
+      payment.order_id !== order.id ||
+      payment.order_id !== razorpay_order_id ||
+      payment.status !== "captured" ||
+      payment.amount !== order.amount ||
+      payment.currency !== order.currency
+    ) {
+      return res.status(400).json({
+        verified: false,
+        message: "Razorpay payment is not captured or does not match the order.",
+      });
+    }
+
+    return res.json({ verified: true });
+  } catch (error) {
+    console.error("Payment verification error:", error.message);
+    return res.status(500).json({
+      verified: false,
+      message: "Could not verify payment with Razorpay. Please contact the store before retrying.",
+    });
   }
-
-  const signature = crypto.createHmac("sha256", secret)
-    .update(`${razorpay_order_id}|${razorpay_payment_id}`)
-    .digest("hex");
-  const a = Buffer.from(signature);
-  const b = Buffer.from(razorpay_signature);
-  const verified = a.length === b.length && crypto.timingSafeEqual(a, b);
-
-  if (!verified) return res.status(400).json({ verified: false, message: "Invalid payment signature." });
-  return res.json({ verified: true });
 });
 
 app.listen(PORT, () => console.log(`ShopSphere payment API running on ${PORT}`));

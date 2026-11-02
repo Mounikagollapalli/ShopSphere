@@ -26,18 +26,20 @@ export default function Navbar() {
     navigate("/");
   };
 
-  const Badge = ({ n }) =>
-    n > 0 ? (
-      <span className="ml-1 rounded-full bg-indigo-500 px-1.5 py-0.5 text-xs">{n}</span>
-    ) : null;
+  const badge = (count) =>
+    count > 0 && (
+      <span className="ml-1 rounded-full bg-indigo-500 px-1.5 py-0.5 text-xs">
+        {count}
+      </span>
+    );
 
   const accountLinks = (
     <>
       <NavLink to="/wishlist" className={cls} onClick={close}>
-        ♡ Wishlist<Badge n={wishCount} />
+        ♡ Wishlist{badge(wishCount)}
       </NavLink>
       <NavLink to="/cart" className={cls} onClick={close}>
-        🛒 Cart<Badge n={cartCount} />
+        🛒 Cart{badge(cartCount)}
       </NavLink>
 
       {user ? (

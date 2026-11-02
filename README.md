@@ -14,29 +14,28 @@ ShopSphere is a React e-commerce application with a customer storefront and an a
 
 Start three terminals from the project folder.
 
+Install dependencies once from the project folder:
+```bash
+npm install
+npm --prefix payment-server install
+```
+
 ### 1. JSON Server
 ```bash
-cd json-server
-npm install
-npx json-server db.json --port 3000
+npm run db
 ```
 JSON Server runs at `http://localhost:3000`.
 
 ### 2. Razorpay payment backend
 ```bash
-cd payment-server
-npm install
+npm run payment
 ```
-Copy `payment-server/.env.example` to `payment-server/.env`. Add your Razorpay **Test Mode** Key ID and Key Secret from the Razorpay Dashboard, then run:
-```bash
-npm run dev
-```
+Copy `payment-server/.env.example` to `payment-server/.env` first. Add your Razorpay **Test Mode** Key ID and Key Secret from the Razorpay Dashboard.
 The payment API runs at `http://localhost:5000`; health check: `http://localhost:5000/api/health`.
 
 ### 3. React frontend
 In the project root, copy `.env.example` to `.env`. Add your Razorpay **Test Key ID** to `VITE_RAZORPAY_KEY_ID`, then run:
 ```bash
-npm install
 npm run dev
 ```
 Vite runs at `http://localhost:5173`.
@@ -64,3 +63,5 @@ Use the test payment details supplied in Razorpay's official Test Mode guidance.
 Deploy `payment-server` as a separate Node service. Set `RAZORPAY_KEY_ID`, `RAZORPAY_KEY_SECRET`, `JSON_SERVER_URL`, and `FRONTEND_URL` in that service's environment settings. In Vercel, set `VITE_PAYMENT_API_URL` to the deployed payment API URL and `VITE_RAZORPAY_KEY_ID` to the Test Key ID, then redeploy.
 
 This is a learning/demo integration. Production order persistence, stock updates, authentication and payment state should be handled by a trusted backend and database rather than a browser-only JSON Server.
+
+The demo JSON Server exposes its collections, including user records, and the admin routes are not protected. Do not use real customer data or deploy this setup as a production store.

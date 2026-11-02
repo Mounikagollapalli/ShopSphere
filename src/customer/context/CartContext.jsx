@@ -4,6 +4,19 @@ import { useAuth } from "./AuthContext";
 
 const CartContext = createContext(null);
 
+async function fetchCartData(uid) {
+  if (!uid) return { cart: [], wishlist: [] };
+
+  const [cart, wishlist] = await Promise.allSettled([
+    api.get("/cart", { params: { userId: uid } }),
+    api.get("/wishlist", { params: { userId: uid } }),
+  ]);
+  return {
+    cart: cart.status === "fulfilled" ? cart.value.data : [],
+    wishlist: wishlist.status === "fulfilled" ? wishlist.value.data : [],
+  };
+}
+
 export function CartProvider({ children }) {
   const { user } = useAuth();
   const uid = user?.id;
@@ -13,22 +26,23 @@ export function CartProvider({ children }) {
 
   // Load this user's cart and wishlist from JSON Server
   const load = useCallback(async () => {
-    if (!uid) {
-      setCart([]);
-      setWishlist([]);
-      return;
-    }
-    const [c, w] = await Promise.allSettled([
-      api.get("/cart", { params: { userId: uid } }),
-      api.get("/wishlist", { params: { userId: uid } }),
-    ]);
-    setCart(c.status === "fulfilled" ? c.value.data : []);
-    setWishlist(w.status === "fulfilled" ? w.value.data : []);
+    const data = await fetchCartData(uid);
+    setCart(data.cart);
+    setWishlist(data.wishlist);
   }, [uid]);
 
   useEffect(() => {
-    load();
-  }, [load]);
+    let active = true;
+    fetchCartData(uid).then((data) => {
+      if (active) {
+        setCart(data.cart);
+        setWishlist(data.wishlist);
+      }
+    });
+    return () => {
+      active = false;
+    };
+  }, [uid]);
 
   // ---------- Cart ----------
   // Returns false when the user is not logged in

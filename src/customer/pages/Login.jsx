@@ -51,7 +51,7 @@ export default function Login() {
           onChange={(e) => setForm({ ...form, password: e.target.value })}
         />
 
-        
+        {error && <p className="text-sm text-red-600">{error}</p>}
 
         <button
           disabled={busy}

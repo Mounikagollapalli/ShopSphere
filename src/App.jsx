@@ -52,6 +52,17 @@ export default function App() {
         <Route path="analytics" element={<Analytics />} />
         <Route path="reports" element={<Reports />} />
       </Route>
+      <Route
+        path="*"
+        element={
+          <main className="px-4 py-16 text-center">
+            <h1 className="text-2xl font-bold">Page not found</h1>
+            <a className="mt-4 inline-block text-indigo-600 underline" href="/">
+              Return home
+            </a>
+          </main>
+        }
+      />
     </Routes>
   );
 }

@@ -100,7 +100,7 @@ export default function Products() {
       else await api.post("/products", body);
       setForm(null);
       reload();
-    } catch (error) {
+    } catch {
       alert("Unable to save product. Please check your server.");
     }
   };
@@ -110,7 +110,7 @@ export default function Products() {
       try {
         await api.delete(`/products/${id}`);
         reload();
-      } catch (error) {
+      } catch {
         alert("Unable to delete product.");
       }
     }

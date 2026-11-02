@@ -70,7 +70,7 @@
       "price": 69999,
       "discount": 10,
       "rating": 4.5,
-      "stock": 30,
+      "stock": 29,
       "description": "Fast flagship phone with large battery.",
       "image": "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTCTPan88SRswVU-gcVl35aWxPzwivD9b9hVHgubDlQew&s"
     },
@@ -94,7 +94,7 @@
       "price": 99900,
       "discount": 6,
       "rating": 4.8,
-      "stock": 14,
+      "stock": 13,
       "description": "13.6 inch thin and light laptop with M4 chip.",
       "image": "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTgRn9K1I4m9jdTBOSdbM4OujP7FY3RPlzFFIomtOi2CQ&s=10"
     },
@@ -476,7 +476,14 @@
       "id": "wNSOjAb"
     }
   ],
-  "cart": [],
+  "cart": [
+    {
+      "userId": "wNSOjAb",
+      "productId": "14",
+      "qty": 1,
+      "id": 2
+    }
+  ],
   "wishlist": [
     {
       "userId": "wNSOjAb",
@@ -736,6 +743,51 @@
         "pincode": "500017"
       },
       "id": "jvW2z-y"
+    },
+    {
+      "customerId": "wNSOjAb",
+      "date": "2026-11-02",
+      "status": "Pending",
+      "total": 99900,
+      "items": [
+        {
+          "productId": "5",
+          "qty": 1,
+          "price": 99900
+        }
+      ],
+      "payment": "Cash on Delivery",
+      "shipping": {
+        "name": "Gollapalli Mounika",
+        "phone": "8121832648",
+        "address": "Mettuguda\nSecunderabad",
+        "city": "Hyderabad",
+        "pincode": "500017"
+      },
+      "id": "p6GQ6WM"
+    },
+    {
+      "customerId": "wNSOjAb",
+      "date": "2026-11-02",
+      "status": "Pending",
+      "total": 69999,
+      "items": [
+        {
+          "productId": "3",
+          "qty": 1,
+          "price": 69999
+        }
+      ],
+      "payment": "Cash on Delivery",
+      "paymentStatus": "Pending",
+      "shipping": {
+        "name": "Gollapalli Mounika",
+        "phone": "8121832648",
+        "address": "Lallaguda",
+        "city": "Secunderabad",
+        "pincode": "500017"
+      },
+      "id": "TjPA-hE"
     }
   ]
 }

@@ -13,6 +13,13 @@ const BADGE = {
   Cancelled: "bg-red-100 text-red-700",
 };
 
+async function fetchOrders(uid) {
+  const { data } = await api.get("/orders", { params: { customerId: uid } });
+  return [...data].sort(
+    (a, b) => b.date.localeCompare(a.date) || Number(b.id) - Number(a.id)
+  );
+}
+
 export default function MyOrders() {
   const { user } = useAuth();
   const { products } = useCatalog();
@@ -24,22 +31,36 @@ export default function MyOrders() {
   const [error, setError] = useState("");
 
   const load = useCallback(async () => {
-    if (!uid) {
-      setLoading(false);
-      return;
-    }
+    if (!uid) return;
     try {
-      const { data } = await api.get("/orders", { params: { customerId: uid } });
-      setOrders([...data].sort((a, b) => b.date.localeCompare(a.date) || Number(b.id) - Number(a.id)));
-    } catch (err) {
+      setOrders(await fetchOrders(uid));
+      setError("");
+    } catch {
       setError("Could not load your orders.");
     }
     setLoading(false);
   }, [uid]);
 
   useEffect(() => {
-    load();
-  }, [load]);
+    if (!uid) return undefined;
+    let active = true;
+    fetchOrders(uid)
+      .then((data) => {
+        if (active) {
+          setOrders(data);
+          setLoading(false);
+        }
+      })
+      .catch(() => {
+        if (active) {
+          setError("Could not load your orders.");
+          setLoading(false);
+        }
+      });
+    return () => {
+      active = false;
+    };
+  }, [uid]);
 
   const nameOf = (id) =>
     products.find((p) => String(p.id) === String(id))?.name || "Removed product";
@@ -49,19 +70,19 @@ export default function MyOrders() {
     setError("");
     try {
       await api.patch(`/orders/${o.id}`, { status: "Cancelled" });
-      // Put the stock back
-      await Promise.all(
+      const stockUpdates = await Promise.allSettled(
         o.items.map(async (i) => {
-          try {
-            const { data: p } = await api.get(`/products/${i.productId}`);
-            await api.patch(`/products/${p.id}`, { stock: p.stock + i.qty });
-          } catch {
-            /* product was removed, nothing to restore */
-          }
+          const { data: product } = await api.get(`/products/${i.productId}`);
+          await api.patch(`/products/${product.id}`, {
+            stock: Number(product.stock) + Number(i.qty),
+          });
         })
       );
-      load();
-    } catch (err) {
+      await load();
+      if (stockUpdates.some((result) => result.status === "rejected")) {
+        setError("Order cancelled, but stock could not be restored for every item.");
+      }
+    } catch {
       setError("Could not cancel the order.");
     }
   };
@@ -126,7 +147,7 @@ export default function MyOrders() {
 
               <div className="mt-3 flex items-center justify-between border-t pt-3">
                 <p className="font-bold text-indigo-600">Total: {money(o.total)}</p>
-                {o.status === "Pending" && (
+                {o.status === "Pending" && o.paymentStatus !== "Paid" && (
                   <button onClick={() => cancel(o)} className="text-sm text-red-600 hover:underline">
                     Cancel order
                   </button>

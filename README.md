@@ -12,56 +12,102 @@ ShopSphere is a React e-commerce application with a customer storefront and an a
 
 ## Run locally
 
-Start three terminals from the project folder.
+Open the ShopSphere project folder in VS Code. Start three separate terminals. Keep all three running.
 
-Install dependencies once from the project folder:
+### 1. Start the data server
+
+In the first terminal, stay in the main ShopSphere project folder and run:
+
 ```bash
 npm install
-npm --prefix payment-server install
+npm run server
 ```
 
-### 1. JSON Server
+This starts JSON Server using `json-server/db.json` at `http://localhost:3000`.
+
+### 2. Start the Razorpay payment server
+
+In the second terminal, run:
+
 ```bash
-npm run db
+cd payment-server
+npm install
 ```
-JSON Server runs at `http://localhost:3000`.
 
-### 2. Razorpay payment backend
-```bash
-npm run payment
+Create a file named `.env` inside the `payment-server` folder. Copy the variable names from `payment-server/.env.example` and add your own Razorpay **Test Mode** credentials:
+
+```env
+PORT=5000
+RAZORPAY_KEY_ID=rzp_test_your_actual_key_id
+RAZORPAY_KEY_SECRET=your_actual_test_key_secret
+JSON_SERVER_URL=http://localhost:3000
+FRONTEND_URL=http://localhost:5173
 ```
-Copy `payment-server/.env.example` to `payment-server/.env` first. Add your Razorpay **Test Mode** Key ID and Key Secret from the Razorpay Dashboard.
-The payment API runs at `http://localhost:5000`; health check: `http://localhost:5000/api/health`.
 
-### 3. React frontend
-In the project root, copy `.env.example` to `.env`. Add your Razorpay **Test Key ID** to `VITE_RAZORPAY_KEY_ID`, then run:
+Save the file, then run:
+
 ```bash
 npm run dev
 ```
-Vite runs at `http://localhost:5173`.
+
+The payment server runs at `http://localhost:5000`. You can check it at `http://localhost:5000/api/health`; it should return `{"ok":true}`.
+
+### 3. Start the ShopSphere website
+
+In the third terminal, go back to the main ShopSphere project folder:
+
+```bash
+cd ..
+```
+
+If this terminal is already in the main project folder, do not run `cd ..`.
+
+Create a file named `.env` in the main project folder (the same folder as the root `package.json`). Copy the variable names from `.env.example` and set your Razorpay Test Key ID:
+
+```env
+VITE_API_URL=http://localhost:3000
+VITE_PAYMENT_API_URL=http://localhost:5000
+VITE_RAZORPAY_KEY_ID=rzp_test_your_actual_key_id
+```
+
+Run:
+
+```bash
+npm run dev
+```
+
+Open the local website shown by Vite, usually `http://localhost:5173`.
 
 ## Razorpay Test Mode
-1. Sign in to Razorpay Dashboard and switch to **Test Mode**.
-2. Open **Account & Settings → API Keys** and generate a Test Key pair.
-3. Put both test keys in `payment-server/.env`.
-4. Put only the Test Key ID in the root `.env` as `VITE_RAZORPAY_KEY_ID`.
-5. Restart the payment server and Vite after changing environment variables.
 
-Use the test payment details supplied in Razorpay's official Test Mode guidance. Test Mode simulates payments; it does not deduct real money.
+1. Sign in to the Razorpay Dashboard and switch to **Test Mode**.
+2. Open **Account & Settings → API Keys** and generate a Test Key pair.
+3. Put the Test Key ID and Test Key Secret in `payment-server/.env`.
+4. Put only the Test Key ID in the root `.env` as `VITE_RAZORPAY_KEY_ID`.
+5. Restart both the payment server and Vite after changing environment variables.
+
+Use Razorpay's test payment details when checking out. Test Mode simulates payments; it does not charge real money.
 
 ## Payment flow
-1. Checkout sends product IDs and quantities to the payment backend.
-2. The backend reads current prices and stock from JSON Server and creates a Razorpay order in paise.
+
+1. Checkout sends product IDs and quantities to the payment server.
+2. The payment server reads current prices and stock from JSON Server and creates a Razorpay order in paise.
 3. Razorpay Checkout opens in the browser.
-4. The backend verifies the HMAC SHA-256 signature using the secret key.
-5. Only after successful verification does the frontend save the order as paid, update customer details and stock, clear the cart, and navigate to Orders.
+4. The payment server verifies the payment signature using the secret key.
+5. After successful verification, the frontend saves the order, updates customer details and stock, clears the cart, and opens the Orders page.
 6. Cash on Delivery remains available.
 
-**Never put `RAZORPAY_KEY_SECRET` in React code, a `VITE_*` variable, GitHub, or Vercel frontend environment variables.** Keep it only in the payment backend's private environment settings.
+**Never put `RAZORPAY_KEY_SECRET` in React code, a `VITE_*` variable, GitHub, or Vercel frontend environment variables.** Keep it only in the payment server's private environment settings.
+
+## Security and demo limitations
+
+- This project uses JSON Server as a learning/demo API. Do not store real customer information in it.
+- The current demo login is not production-grade authentication. Use only synthetic test accounts and never reuse a real password.
+- Order creation, customer updates, and stock changes are initiated by the browser against JSON Server. A production system needs authenticated backend endpoints, password hashing, authorization, database transactions, and server-side order persistence.
+- Keep all `.env` files and secret credentials out of GitHub.
 
 ## Deployment note
-Deploy `payment-server` as a separate Node service. Set `RAZORPAY_KEY_ID`, `RAZORPAY_KEY_SECRET`, `JSON_SERVER_URL`, and `FRONTEND_URL` in that service's environment settings. In Vercel, set `VITE_PAYMENT_API_URL` to the deployed payment API URL and `VITE_RAZORPAY_KEY_ID` to the Test Key ID, then redeploy.
 
-This is a learning/demo integration. Production order persistence, stock updates, authentication and payment state should be handled by a trusted backend and database rather than a browser-only JSON Server.
+Deploy `payment-server` as a separate Node service. Set `RAZORPAY_KEY_ID`, `RAZORPAY_KEY_SECRET`, `JSON_SERVER_URL`, and `FRONTEND_URL` in that service's private environment settings. In Vercel, set `VITE_PAYMENT_API_URL` to the deployed payment server URL and `VITE_RAZORPAY_KEY_ID` to the Test Key ID, then redeploy.
 
-The demo JSON Server exposes its collections, including user records, and the admin routes are not protected. Do not use real customer data or deploy this setup as a production store.
+This is a learning/demo integration. For real customers and production payments, use a secure backend and database rather than a browser-only JSON Server.

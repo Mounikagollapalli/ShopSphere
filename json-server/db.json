@@ -70,7 +70,7 @@
       "price": 69999,
       "discount": 10,
       "rating": 4.5,
-      "stock": 29,
+      "stock": 30,
       "description": "Fast flagship phone with large battery.",
       "image": "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTCTPan88SRswVU-gcVl35aWxPzwivD9b9hVHgubDlQew&s"
     },
@@ -94,7 +94,7 @@
       "price": 99900,
       "discount": 6,
       "rating": 4.8,
-      "stock": 13,
+      "stock": 14,
       "description": "13.6 inch thin and light laptop with M4 chip.",
       "image": "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTgRn9K1I4m9jdTBOSdbM4OujP7FY3RPlzFFIomtOi2CQ&s=10"
     },
@@ -466,36 +466,10 @@
       "email": "kiran@mail.com",
       "phone": "9876500044",
       "joinedAt": "2026-09-28"
-    },
-    {
-      "name": "Gollapalli Mounika",
-      "email": "mounikagollapalli06@gmail.com",
-      "password": "Mounika@123",
-      "phone": "8121832648",
-      "joinedAt": "2026-11-01",
-      "id": "wNSOjAb"
     }
   ],
-  "cart": [
-    {
-      "userId": "wNSOjAb",
-      "productId": "14",
-      "qty": 1,
-      "id": 2
-    }
-  ],
-  "wishlist": [
-    {
-      "userId": "wNSOjAb",
-      "productId": "31",
-      "id": 2
-    },
-    {
-      "userId": "wNSOjAb",
-      "productId": "4",
-      "id": 3
-    }
-  ],
+  "cart": [],
+  "wishlist": [],
   "orders": [
     {
       "id": "1",
@@ -628,166 +602,6 @@
           "price": 3900
         }
       ]
-    },
-    {
-      "customerId": "wNSOjAb",
-      "date": "2026-11-01",
-      "status": "Delivered",
-      "total": 149900,
-      "items": [
-        {
-          "productId": "1",
-          "qty": 1,
-          "price": 149900
-        }
-      ],
-      "payment": "Cash on Delivery",
-      "shipping": {
-        "name": "Gollapalli Mounika",
-        "phone": "8121832648",
-        "address": "Mettuguda\nSecunderabad",
-        "city": "Hyderabad",
-        "pincode": "500017"
-      },
-      "id": "CEiljS1"
-    },
-    {
-      "customerId": "wNSOjAb",
-      "date": "2026-11-01",
-      "status": "Delivered",
-      "total": 99900,
-      "items": [
-        {
-          "productId": "5",
-          "qty": 1,
-          "price": 99900
-        }
-      ],
-      "payment": "UPI (demo)",
-      "shipping": {
-        "name": "Gollapalli Mounika",
-        "phone": "8121832648",
-        "address": "Lallaguda",
-        "city": "Secunderabad",
-        "pincode": "500017"
-      },
-      "id": "tJP9e4-"
-    },
-    {
-      "customerId": "wNSOjAb",
-      "date": "2026-11-01",
-      "status": "Cancelled",
-      "total": 54990,
-      "items": [
-        {
-          "productId": "30",
-          "qty": 1,
-          "price": 54990
-        }
-      ],
-      "payment": "Cash on Delivery",
-      "shipping": {
-        "name": "Gollapalli Mounika",
-        "phone": "8121832648",
-        "address": "Mettuguda\nSecunderabad",
-        "city": "Hyderabad",
-        "pincode": "500017"
-      },
-      "id": "MtT18SV"
-    },
-    {
-      "customerId": "wNSOjAb",
-      "date": "2026-11-01",
-      "status": "Cancelled",
-      "total": 8999,
-      "items": [
-        {
-          "productId": "24",
-          "qty": 1,
-          "price": 8999
-        }
-      ],
-      "payment": "Cash on Delivery",
-      "shipping": {
-        "name": "Gollapalli Mounika",
-        "phone": "8121832648",
-        "address": "Mettuguda\nSecunderabad",
-        "city": "Hyderabad",
-        "pincode": "500017"
-      },
-      "id": "R7YD6a_"
-    },
-    {
-      "customerId": "wNSOjAb",
-      "date": "2026-11-02",
-      "status": "Delivered",
-      "total": 243489,
-      "items": [
-        {
-          "productId": "ly_Eie8",
-          "qty": 1,
-          "price": 93490
-        },
-        {
-          "productId": "6",
-          "qty": 1,
-          "price": 149999
-        }
-      ],
-      "payment": "UPI (demo)",
-      "shipping": {
-        "name": "Gollapalli Mounika",
-        "phone": "8121832648",
-        "address": "Mettuguda\nSecunderabad",
-        "city": "Hyderabad",
-        "pincode": "500017"
-      },
-      "id": "jvW2z-y"
-    },
-    {
-      "customerId": "wNSOjAb",
-      "date": "2026-11-02",
-      "status": "Pending",
-      "total": 99900,
-      "items": [
-        {
-          "productId": "5",
-          "qty": 1,
-          "price": 99900
-        }
-      ],
-      "payment": "Cash on Delivery",
-      "shipping": {
-        "name": "Gollapalli Mounika",
-        "phone": "8121832648",
-        "address": "Mettuguda\nSecunderabad",
-        "city": "Hyderabad",
-        "pincode": "500017"
-      },
-      "id": "p6GQ6WM"
-    },
-    {
-      "customerId": "wNSOjAb",
-      "date": "2026-11-02",
-      "status": "Pending",
-      "total": 69999,
-      "items": [
-        {
-          "productId": "3",
-          "qty": 1,
-          "price": 69999
-        }
-      ],
-      "payment": "Cash on Delivery",
-      "paymentStatus": "Pending",
-      "shipping": {
-        "name": "Gollapalli Mounika",
-        "phone": "8121832648",
-        "address": "Lallaguda",
-        "city": "Secunderabad",
-        "pincode": "500017"
-      },
-      "id": "TjPA-hE"
     }
   ]
 }

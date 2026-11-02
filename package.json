@@ -4,7 +4,12 @@
   "version": "0.0.0",
   "type": "module",
   "scripts": {
+<<<<<<< HEAD
     "dev": "vite --port 5173 --strictPort",
+=======
+    "dev": "vite",
+    "server": "json-server json-server/db.json --port 3000",
+>>>>>>> 0515f7f4c12bb6ff1ef5502f2915cf069e8f1efd
     "build": "vite build",
     "lint": "eslint .",
     "preview": "vite preview",

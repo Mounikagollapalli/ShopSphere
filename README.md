@@ -18,7 +18,7 @@ Start three terminals from the project folder.
 ```bash
 cd json-server
 npm install
-npm start
+npx json-server db.json --port 3000
 ```
 JSON Server runs at `http://localhost:3000`.
 

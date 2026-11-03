@@ -9,15 +9,9 @@ import { money } from "../../admin/utils/helpers";
 // Razorpay frontend configuration
 const RAZORPAY_KEY_ID = (import.meta.env.VITE_RAZORPAY_KEY_ID || "").trim();
 
-const PAYMENT_API = import.meta.env.DEV
-  ? "http://localhost:5000"
-  : "";
+const PAYMENT_API = import.meta.env.DEV ? "http://localhost:5000" : "";
 
 async function postPaymentRequest(path, body) {
-  
-  const PAYMENT_API = import.meta.env.DEV
-  ? "http://localhost:5000"
-  : "";
 
   let response;
   try {
@@ -29,7 +23,7 @@ async function postPaymentRequest(path, body) {
   } catch (error) {
     console.error(`Payment API request failed (${path}):`, error);
     throw new Error(
-      `Could not connect to the payment backend at ${PAYMENT_API}. Check that it is running and reachable. For a Vercel site, configure VITE_PAYMENT_API_URL with the deployed backend URL; localhost only refers to the visitor's device.`,
+      `Could not reach the ShopSphere payment endpoint (${path}). Check the Vercel /api/payments rewrite and payment-server deployment.`,
       { cause: error }
     );
   }

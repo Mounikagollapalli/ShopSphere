@@ -17,11 +17,6 @@ const PAYMENT_API = (
   .replace(/\/+$/, "");
 
 async function postPaymentRequest(path, body) {
-  if (!PAYMENT_API) {
-    throw new Error(
-      "Payment backend URL is not configured. Set VITE_PAYMENT_API_URL in the frontend environment and rebuild."
-    );
-  }
 
   let response;
   try {

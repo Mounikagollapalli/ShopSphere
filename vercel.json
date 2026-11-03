@@ -1,3 +1,16 @@
 {
-  "rewrites": [{ "source": "/(.*)", "destination": "/index.html" }]
+  "$schema": "https://openapi.vercel.sh/vercel.json",
+  "services": {
+    "app": { "root": ".", "framework": "vite" },
+    "payment-server": {
+      "root": "payment-server",
+      "framework": "express",
+      "entrypoint": "server.js"
+    }
+  },
+  "rewrites": [
+    { "source": "/api/payments/(.*)", "destination": { "service": "payment-server" } },
+    { "source": "/api/health", "destination": { "service": "payment-server" } },
+    { "source": "/(.*)", "destination": { "service": "app" } }
+  ]
 }

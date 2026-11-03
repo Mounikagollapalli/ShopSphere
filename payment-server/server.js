@@ -118,4 +118,8 @@ app.post("/api/payments/verify", async (req, res) => {
   }
 });
 
-app.listen(PORT, () => console.log(`ShopSphere payment API running on ${PORT}`));
+if (!process.env.VERCEL) {
+  app.listen(PORT, () => console.log(`ShopSphere payment API running on ${PORT}`));
+}
+
+export default app;

@@ -247,12 +247,8 @@ export default function Checkout() {
 
     // Follow-up updates. A failure here must not hide the success screen,
     // because the order is already saved (and may already be paid).
+    // 1) Reduce stock (separate, so a profile-update failure cannot skip it)
     try {
-      await api.patch(`/users/${user.id}`, {
-        name: form.name,
-        phone: form.phone,
-      });
-
       await Promise.all(
         latest.map((product, index) =>
           api.patch(`/products/${product.id}`, {
@@ -260,8 +256,18 @@ export default function Checkout() {
           })
         )
       );
-    } catch (updateError) {
-      console.error("Order saved, but follow-up updates failed:", updateError);
+    } catch (stockError) {
+      console.error("Order saved, but stock could not be updated:", stockError);
+    }
+
+    // 2) Save the customer's name/phone (optional, safe to fail)
+    try {
+      await api.patch(`/users/${user.id}`, {
+        name: form.name,
+        phone: form.phone,
+      });
+    } catch (profileError) {
+      console.error("Order saved, but the profile could not be updated:", profileError);
     }
 
     try {

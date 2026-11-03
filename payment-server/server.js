@@ -118,16 +118,4 @@ app.post("/api/payments/verify", async (req, res) => {
   }
 });
 
-// Single listener. Do not add another app.listen anywhere in this file.
-const server = app.listen(PORT, () => {
-  console.log(`ShopSphere payment API running on ${PORT}`);
-});
-
-server.on("error", (err) => {
-  if (err.code === "EADDRINUSE") {
-    console.error(`Port ${PORT} is already in use. Stop the other process or change PORT in .env.`);
-  } else {
-    console.error("Server error:", err.message);
-  }
-  process.exit(1);
-});
+app.listen(PORT, () => console.log(`ShopSphere payment API running on ${PORT}`));

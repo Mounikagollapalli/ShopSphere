@@ -94,7 +94,7 @@
       "price": 99900,
       "discount": 6,
       "rating": 4.8,
-      "stock": 14,
+      "stock": 13,
       "description": "13.6 inch thin and light laptop with M4 chip.",
       "image": "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTgRn9K1I4m9jdTBOSdbM4OujP7FY3RPlzFFIomtOi2CQ&s=10"
     },
@@ -298,7 +298,7 @@
       "price": 3900,
       "discount": 0,
       "rating": 4.6,
-      "stock": 45,
+      "stock": 44,
       "description": "Compact dual port fast charger.",
       "image": "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTOABSJh4im_XN67cYRQ9I1QHEj8TUcr6mk1iXK1N1Cyg&s=10"
     },
@@ -466,6 +466,14 @@
       "email": "kiran@mail.com",
       "phone": "9876500044",
       "joinedAt": "2026-09-28"
+    },
+    {
+      "name": "juttu",
+      "email": "rohini@gmail.com",
+      "password": "Rohini@123",
+      "phone": "8121832648",
+      "joinedAt": "2026-11-03",
+      "id": "ooJm3Xw"
     }
   ],
   "cart": [],
@@ -700,6 +708,56 @@
         "pincode": "500017"
       },
       "id": "OYlkASr"
+    },
+    {
+      "customerId": "wNSOjAb",
+      "date": "2026-11-03",
+      "status": "Pending",
+      "total": 99900,
+      "items": [
+        {
+          "productId": "5",
+          "qty": 1,
+          "price": 99900
+        }
+      ],
+      "payment": "Razorpay (Test Mode)",
+      "paymentStatus": "Paid",
+      "razorpayOrderId": "order_TvcGn8neBEvF5S",
+      "razorpayPaymentId": "pay_TvcGxBdx4Dljis",
+      "shipping": {
+        "name": "Gollapalli Mounika",
+        "phone": "8121832648",
+        "address": "Lallaguda",
+        "city": "Secunderabad",
+        "pincode": "500017"
+      },
+      "id": "TyBq1RU"
+    },
+    {
+      "customerId": "ooJm3Xw",
+      "date": "2026-11-03",
+      "status": "Pending",
+      "total": 3900,
+      "items": [
+        {
+          "productId": "22",
+          "qty": 1,
+          "price": 3900
+        }
+      ],
+      "payment": "Razorpay (Test Mode)",
+      "paymentStatus": "Paid",
+      "razorpayOrderId": "order_TvcWzGkvp6CFDQ",
+      "razorpayPaymentId": "pay_TvcX5xE3W9vS2T",
+      "shipping": {
+        "name": "juttu",
+        "phone": "8121832648",
+        "address": "Lallaguda",
+        "city": "Secunderabad",
+        "pincode": "500017"
+      },
+      "id": "euItFS4"
     }
   ]
 }

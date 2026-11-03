@@ -6,53 +6,104 @@ import Razorpay from "razorpay";
 
 const app = express();
 const PORT = Number(process.env.PORT) || 5000;
-baseURL: configuredBaseURL || "http://localhost:3000"
-const origins = (process.env.FRONTEND_URL || "http://localhost:5173").split(",").map((v) => v.trim());
+const DATA_URL = (
+  process.env.JSON_SERVER_URL ||
+  (process.env.NODE_ENV !== "production" ? "http://localhost:3000" : "")
+).replace(/\/+$/, "");
 
-app.use(cors({ origin: origins }));
+const allowedOrigins = (process.env.FRONTEND_URL || "http://localhost:5173")
+  .split(",")
+  .map((origin) => origin.trim())
+  .filter(Boolean);
+
+app.use(
+  cors({
+    origin(origin, callback) {
+      if (!origin || allowedOrigins.includes(origin)) {
+        return callback(null, true);
+      }
+      return callback(new Error("Origin is not allowed by ShopSphere CORS."));
+    },
+  })
+);
 app.use(express.json());
 
 function razorpayClient() {
   const key_id = process.env.RAZORPAY_KEY_ID;
   const key_secret = process.env.RAZORPAY_KEY_SECRET;
-  if (!key_id || !key_secret) throw new Error("Set Razorpay test keys in payment-server/.env");
+
+  if (!key_id || !key_secret) {
+    throw new Error("Payment server is missing RAZORPAY_KEY_ID or RAZORPAY_KEY_SECRET.");
+  }
+
   return new Razorpay({ key_id, key_secret });
 }
 
-app.get("/api/health", (_req, res) => res.json({ ok: true }));
+app.get("/api/health", (_req, res) => {
+  res.json({
+    ok: true,
+    dataConfigured: Boolean(DATA_URL),
+    razorpayConfigured: Boolean(
+      process.env.RAZORPAY_KEY_ID && process.env.RAZORPAY_KEY_SECRET
+    ),
+  });
+});
 
 app.post("/api/payments/create-order", async (req, res) => {
   try {
-    if (!Array.isArray(req.body.items) || !req.body.items.length) {
+    if (!DATA_URL) {
+      return res.status(503).json({
+        message: "Payment server is missing JSON_SERVER_URL configuration.",
+      });
+    }
+
+    if (!Array.isArray(req.body.items) || req.body.items.length === 0) {
       return res.status(400).json({ message: "Cart is empty." });
     }
 
     const quantities = new Map();
+
     for (const item of req.body.items) {
       const id = String(item.productId || "");
       const qty = Number(item.qty);
+
       if (!id || !Number.isInteger(qty) || qty < 1 || qty > 20) {
         return res.status(400).json({ message: "Invalid cart item." });
       }
+
       quantities.set(id, (quantities.get(id) || 0) + qty);
     }
 
     let total = 0;
+
     for (const [id, qty] of quantities) {
-      const response = await fetch(`${DATA_URL}/products/${encodeURIComponent(id)}`);
-      if (!response.ok) return res.status(400).json({ message: "Product not found." });
+      const response = await fetch(
+        `${DATA_URL}/products/${encodeURIComponent(id)}`
+      );
+
+      if (!response.ok) {
+        return res.status(400).json({ message: "Product not found in the catalog." });
+      }
+
       const product = await response.json();
       const price = Number(product.price);
+      const stock = Number(product.stock);
+
       if (!Number.isFinite(price) || price <= 0) {
-        return res.status(400).json({ message: "Invalid product price." });
+        return res.status(400).json({ message: "Product has an invalid price." });
       }
-      if (Number(product.stock) < qty) {
-        return res.status(409).json({ message: `Only ${product.stock} of ${product.name} are available.` });
+
+      if (!Number.isFinite(stock) || stock < qty) {
+        return res.status(409).json({
+          message: `Only ${Number.isFinite(stock) ? stock : 0} of ${product.name || "this product"} are available.`,
+        });
       }
+
       total += price * qty;
     }
 
     const amount = Math.round(total * 100);
+
     if (!Number.isSafeInteger(amount) || amount < 100) {
       return res.status(400).json({ message: "Invalid payment amount." });
     }
@@ -62,10 +113,17 @@ app.post("/api/payments/create-order", async (req, res) => {
       currency: "INR",
       receipt: `shopsphere_${Date.now()}`,
     });
-    return res.status(201).json({ id: order.id, amount: order.amount, currency: order.currency });
+
+    return res.status(201).json({
+      id: order.id,
+      amount: order.amount,
+      currency: order.currency,
+    });
   } catch (error) {
     console.error("Create order error:", error.message);
-    return res.status(500).json({ message: error.message || "Could not create payment order." });
+    return res.status(500).json({
+      message: "Could not create the Razorpay order. Check payment server configuration.",
+    });
   }
 });
 
@@ -73,22 +131,32 @@ app.post("/api/payments/verify", async (req, res) => {
   try {
     const { razorpay_order_id, razorpay_payment_id, razorpay_signature } = req.body;
     const secret = process.env.RAZORPAY_KEY_SECRET;
+
     if (!secret || !razorpay_order_id || !razorpay_payment_id || !razorpay_signature) {
-      return res.status(400).json({ verified: false, message: "Missing payment verification details." });
+      return res.status(400).json({
+        verified: false,
+        message: "Missing payment verification details.",
+      });
     }
 
-    const signature = crypto.createHmac("sha256", secret)
+    const expectedSignature = crypto
+      .createHmac("sha256", secret)
       .update(`${razorpay_order_id}|${razorpay_payment_id}`)
       .digest("hex");
-    const a = Buffer.from(signature);
-    const b = Buffer.from(razorpay_signature);
-    const signatureValid = a.length === b.length && crypto.timingSafeEqual(a, b);
+
+    const expected = Buffer.from(expectedSignature);
+    const received = Buffer.from(razorpay_signature);
+    const signatureValid =
+      expected.length === received.length &&
+      crypto.timingSafeEqual(expected, received);
 
     if (!signatureValid) {
-      return res.status(400).json({ verified: false, message: "Invalid payment signature." });
+      return res.status(400).json({
+        verified: false,
+        message: "Invalid Razorpay payment signature.",
+      });
     }
 
-    // Confirm with Razorpay that this payment belongs to the order and is captured.
     const client = razorpayClient();
     const [payment, order] = await Promise.all([
       client.payments.fetch(razorpay_payment_id),
@@ -119,7 +187,9 @@ app.post("/api/payments/verify", async (req, res) => {
 });
 
 if (!process.env.VERCEL) {
-  app.listen(PORT, () => console.log(`ShopSphere payment API running on ${PORT}`));
+  app.listen(PORT, () => {
+    console.log(`ShopSphere payment API running on port ${PORT}`);
+  });
 }
 
 export default app;

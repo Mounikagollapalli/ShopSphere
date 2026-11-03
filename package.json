@@ -4,21 +4,17 @@
   "version": "0.0.0",
   "type": "module",
   "scripts": {
-<<<<<<< HEAD
-    "dev": "vite --port 5173 --strictPort",
-=======
     "dev": "vite",
     "server": "json-server json-server/db.json --port 3000",
->>>>>>> 0515f7f4c12bb6ff1ef5502f2915cf069e8f1efd
+    "start": "json-server json-server/db.json --host 0.0.0.0 --port $PORT",
     "build": "vite build",
     "lint": "eslint .",
-    "preview": "vite preview",
-    "db": "json-server --watch json-server/db.json --host 0.0.0.0 --port 3000",
-    "payment": "npm --prefix payment-server run dev"
+    "preview": "vite preview"
   },
   "dependencies": {
     "@tailwindcss/vite": "^4.3.3",
     "axios": "^1.21.0",
+    "json-server": "^0.17.4",
     "lucide-react": "^1.66.0",
     "react": "^19.3.1",
     "react-dom": "^19.3.1",
@@ -35,7 +31,6 @@
     "eslint-plugin-react-hooks": "^7.1.1",
     "eslint-plugin-react-refresh": "^0.5.7",
     "globals": "^17.13.0",
-    "json-server": "^0.17.4",
     "vite": "^8.3.5"
   }
 }

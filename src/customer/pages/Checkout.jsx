@@ -1,6 +1,5 @@
-
 import { useState } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import { Link } from "react-router-dom";
 import api from "../../api/axios";
 import useCatalog from "../hooks/useCatalog";
 import { useAuth } from "../context/AuthContext";
@@ -8,14 +7,14 @@ import { useCart } from "../context/CartContext";
 import { money } from "../../admin/utils/helpers";
 
 // Razorpay frontend configuration
-const RAZORPAY_KEY_ID = (
-  import.meta.env.VITE_RAZORPAY_KEY_ID || ""
-).trim();
+const RAZORPAY_KEY_ID = (import.meta.env.VITE_RAZORPAY_KEY_ID || "").trim();
 
 const PAYMENT_API = (
   import.meta.env.VITE_PAYMENT_API_URL ||
   (import.meta.env.DEV ? "http://localhost:5000" : "")
-).trim().replace(/\/+$/, "");
+)
+  .trim()
+  .replace(/\/+$/, "");
 
 async function postPaymentRequest(path, body) {
   if (!PAYMENT_API) {
@@ -49,7 +48,9 @@ async function postPaymentRequest(path, body) {
   }
 
   if (!response.ok) {
-    throw new Error(data.message || `Payment request failed (HTTP ${response.status}).`);
+    throw new Error(
+      data.message || `Payment request failed (HTTP ${response.status}).`
+    );
   }
 
   return data;
@@ -64,12 +65,9 @@ function loadRazorpayScript() {
     }
 
     const script = document.createElement("script");
-
     script.src = "https://checkout.razorpay.com/v1/checkout.js";
-
     script.onload = () => resolve(true);
     script.onerror = () => resolve(false);
-
     document.body.appendChild(script);
   });
 }
@@ -78,7 +76,6 @@ export default function Checkout() {
   const { user } = useAuth();
   const { cart, clearCart } = useCart();
   const { products, loading } = useCatalog();
-  const navigate = useNavigate();
 
   const [form, setForm] = useState({
     name: user?.name || "",
@@ -92,24 +89,20 @@ export default function Checkout() {
   const [error, setError] = useState("");
   const [busy, setBusy] = useState(false);
 
+  // Set once the order is saved. Drives the success screen.
+  const [placedOrder, setPlacedOrder] = useState(null);
+
   // Update delivery form
   const handleChange = (event) => {
     const { name, value } = event.target;
-
-    setForm((previous) => ({
-      ...previous,
-      [name]: value,
-    }));
+    setForm((previous) => ({ ...previous, [name]: value }));
   };
 
   // Login check
   if (!user) {
     return (
       <div className="py-16 text-center">
-        <p className="mb-4 text-slate-600">
-          Please login to checkout.
-        </p>
-
+        <p className="mb-4 text-slate-600">Please login to checkout.</p>
         <Link
           to="/login"
           state={{ from: "/checkout" }}
@@ -117,6 +110,40 @@ export default function Checkout() {
         >
           Login
         </Link>
+      </div>
+    );
+  }
+
+  // Success screen. This MUST come before the empty-cart check, because
+  // clearing the cart makes the cart empty and would otherwise hide it.
+  if (placedOrder) {
+    return (
+      <div className="mx-auto max-w-md rounded-xl bg-white p-8 text-center shadow-sm">
+        <div className="mb-3 text-5xl">✅</div>
+        <h2 className="mb-2 text-2xl font-bold">Order placed successfully!</h2>
+        <p className="mb-1 text-slate-600">
+          Thank you for shopping with ShopSphere.
+        </p>
+        <p className="mb-6 text-sm text-slate-500">
+          Order ID: {String(placedOrder.id)} • Total: {money(placedOrder.total)}
+          {placedOrder.paymentStatus === "Paid" ? " • Paid" : ""}
+        </p>
+
+        <div className="flex flex-col gap-3 sm:flex-row sm:justify-center">
+          <Link
+            to="/shop"
+            className="rounded-lg bg-indigo-600 px-5 py-2.5 font-semibold text-white hover:bg-indigo-700"
+          >
+            Start Shopping
+          </Link>
+          <Link
+            to="/orders"
+            state={{ placed: placedOrder.id }}
+            className="rounded-lg border border-slate-300 px-5 py-2.5 font-semibold text-slate-700 hover:bg-slate-50"
+          >
+            View My Orders
+          </Link>
+        </div>
       </div>
     );
   }
@@ -130,8 +157,7 @@ export default function Checkout() {
     .map((item) => ({
       ...item,
       product: products.find(
-        (product) =>
-          String(product.id) === String(item.productId)
+        (product) => String(product.id) === String(item.productId)
       ),
     }))
     .filter((row) => row.product);
@@ -140,10 +166,7 @@ export default function Checkout() {
   if (rows.length === 0) {
     return (
       <div className="py-16 text-center">
-        <p className="mb-4 text-slate-600">
-          Your cart is empty.
-        </p>
-
+        <p className="mb-4 text-slate-600">Your cart is empty.</p>
         <Link
           to="/shop"
           className="rounded-lg bg-indigo-600 px-5 py-2.5 font-semibold text-white"
@@ -156,8 +179,7 @@ export default function Checkout() {
 
   // Calculate total
   const total = rows.reduce(
-    (sum, row) =>
-      sum + Number(row.product.price) * row.qty,
+    (sum, row) => sum + Number(row.product.price) * row.qty,
     0
   );
 
@@ -166,16 +188,13 @@ export default function Checkout() {
     // Get latest product information
     const latest = await Promise.all(
       rows.map((row) =>
-        api
-          .get(`/products/${row.product.id}`)
-          .then((response) => response.data)
+        api.get(`/products/${row.product.id}`).then((response) => response.data)
       )
     );
 
     // Check stock availability
     const short = latest.find(
-      (product, index) =>
-        Number(product.stock) < rows[index].qty
+      (product, index) => Number(product.stock) < rows[index].qty
     );
 
     if (short) {
@@ -192,33 +211,25 @@ export default function Checkout() {
     }));
 
     const orderTotal = items.reduce(
-      (sum, item) =>
-        sum + item.qty * item.price,
+      (sum, item) => sum + item.qty * item.price,
       0
     );
 
-    // Create order
+    // Create order (the critical step)
     const { data: order } = await api.post("/orders", {
       customerId: user.id,
       date: new Date().toISOString().slice(0, 10),
       status: "Pending",
       total: orderTotal,
       items,
-
-      payment:
-        paymentDetails.payment || "Cash on Delivery",
-
-      paymentStatus:
-        paymentDetails.paymentStatus || "Pending",
-
+      payment: paymentDetails.payment || "Cash on Delivery",
+      paymentStatus: paymentDetails.paymentStatus || "Pending",
       ...(paymentDetails.razorpayOrderId && {
         razorpayOrderId: paymentDetails.razorpayOrderId,
       }),
-
       ...(paymentDetails.razorpayPaymentId && {
         razorpayPaymentId: paymentDetails.razorpayPaymentId,
       }),
-
       shipping: {
         name: form.name,
         phone: form.phone,
@@ -228,33 +239,42 @@ export default function Checkout() {
       },
     });
 
-    // Update customer details
-    await api.patch(`/users/${user.id}`, {
-      name: form.name,
-      phone: form.phone,
-    });
+    // The order exists now, so show the success screen immediately.
+    // This happens BEFORE the cart is cleared.
+    setPlacedOrder(order);
+    setError("");
+    setBusy(false);
 
-    // Reduce product stock
-    await Promise.all(
-      latest.map((product, index) =>
-        api.patch(`/products/${product.id}`, {
-          stock: Number(product.stock) - rows[index].qty,
-        })
-      )
-    );
+    // Follow-up updates. A failure here must not hide the success screen,
+    // because the order is already saved (and may already be paid).
+    try {
+      await api.patch(`/users/${user.id}`, {
+        name: form.name,
+        phone: form.phone,
+      });
 
-    // Clear cart
-    await clearCart();
+      await Promise.all(
+        latest.map((product, index) =>
+          api.patch(`/products/${product.id}`, {
+            stock: Number(product.stock) - rows[index].qty,
+          })
+        )
+      );
+    } catch (updateError) {
+      console.error("Order saved, but follow-up updates failed:", updateError);
+    }
 
-    // Navigate to orders
-    navigate("/orders", {
-      state: { placed: order.id },
-    });
+    try {
+      await clearCart();
+    } catch (cartError) {
+      console.error("Order saved, but the cart could not be cleared:", cartError);
+    }
+
+    return order;
   };
 
   // Razorpay payment
   const payWithRazorpay = async () => {
-    // Check Razorpay Key ID
     const keyId = RAZORPAY_KEY_ID;
 
     if (!keyId) {
@@ -269,7 +289,6 @@ export default function Checkout() {
       );
     }
 
-    // Load Razorpay script
     const scriptLoaded = await loadRazorpayScript();
 
     if (!scriptLoaded) {
@@ -279,15 +298,12 @@ export default function Checkout() {
     }
 
     // Create order using backend
-    const orderData = await postPaymentRequest(
-      "/api/payments/create-order",
-      {
-        items: rows.map((row) => ({
-          productId: row.product.id,
-          qty: row.qty,
-        })),
-      }
-    );
+    const orderData = await postPaymentRequest("/api/payments/create-order", {
+      items: rows.map((row) => ({
+        productId: row.product.id,
+        qty: row.qty,
+      })),
+    });
 
     // Open Razorpay checkout
     const checkout = new window.Razorpay({
@@ -312,8 +328,10 @@ export default function Checkout() {
         color: "#4f46e5",
       },
 
-      // Verify successful payment
+      // Runs after the customer completes payment in the popup
       handler: async (paymentResponse) => {
+        let verified = false;
+
         try {
           const verification = await postPaymentRequest(
             "/api/payments/verify",
@@ -321,27 +339,27 @@ export default function Checkout() {
           );
 
           if (!verification.verified) {
-            throw new Error(verification.message || "Payment verification failed.");
+            throw new Error(
+              verification.message || "Payment verification failed."
+            );
           }
 
-          // Save successfully verified order
+          verified = true;
+
           await saveOrder({
             payment: "Razorpay (Test Mode)",
             paymentStatus: "Paid",
-            razorpayOrderId:
-              paymentResponse.razorpay_order_id,
-            razorpayPaymentId:
-              paymentResponse.razorpay_payment_id,
+            razorpayOrderId: paymentResponse.razorpay_order_id,
+            razorpayPaymentId: paymentResponse.razorpay_payment_id,
           });
         } catch (paymentError) {
-          console.error(
-            "Payment/order error:",
-            paymentError
-          );
+          console.error("Payment/order error:", paymentError);
 
           setError(
-            paymentError.message ||
-              "Payment was received, but the order could not be saved. Please contact the store."
+            verified
+              ? `Payment was received (ID: ${paymentResponse.razorpay_payment_id}), but the order could not be saved: ${paymentError.message}. Please contact the store.`
+              : paymentError.message ||
+                  "Payment could not be verified. Please try again."
           );
 
           setBusy(false);
@@ -360,7 +378,6 @@ export default function Checkout() {
         event.error?.description ||
           "Payment was not completed. Please try again."
       );
-
       setBusy(false);
     });
 
@@ -401,19 +418,12 @@ export default function Checkout() {
 
   return (
     <div className="space-y-5">
-      <h2 className="text-2xl font-bold">
-        Checkout
-      </h2>
+      <h2 className="text-2xl font-bold">Checkout</h2>
 
-      <form
-        onSubmit={placeOrder}
-        className="grid gap-6 lg:grid-cols-3"
-      >
+      <form onSubmit={placeOrder} className="grid gap-6 lg:grid-cols-3">
         {/* Delivery Details */}
         <div className="space-y-4 rounded-xl bg-white p-5 shadow-sm lg:col-span-2">
-          <h3 className="font-semibold">
-            Delivery details
-          </h3>
+          <h3 className="font-semibold">Delivery details</h3>
 
           <input
             className={input}
@@ -469,9 +479,7 @@ export default function Checkout() {
           </div>
 
           {/* Payment Method */}
-          <h3 className="pt-2 font-semibold">
-            Payment method
-          </h3>
+          <h3 className="pt-2 font-semibold">Payment method</h3>
 
           <select
             className={input}
@@ -485,8 +493,8 @@ export default function Checkout() {
 
           {form.payment === "Razorpay Test Mode" ? (
             <p className="rounded-lg bg-amber-50 p-3 text-xs text-amber-800">
-              Test Mode only: Razorpay checkout will
-              open, but no real money will be charged.
+              Test Mode only: Razorpay checkout will open, but no real money
+              will be charged.
             </p>
           ) : (
             <p className="text-xs text-slate-500">
@@ -497,25 +505,15 @@ export default function Checkout() {
 
         {/* Order Summary */}
         <div className="h-fit rounded-xl bg-white p-5 shadow-sm">
-          <h3 className="mb-3 text-lg font-semibold">
-            Order Summary
-          </h3>
+          <h3 className="mb-3 text-lg font-semibold">Order Summary</h3>
 
           <div className="space-y-2 text-sm">
             {rows.map((row) => (
-              <div
-                key={row.id}
-                className="flex justify-between gap-3"
-              >
+              <div key={row.id} className="flex justify-between gap-3">
                 <span className="text-slate-600">
                   {row.product.name} × {row.qty}
                 </span>
-
-                <span>
-                  {money(
-                    row.product.price * row.qty
-                  )}
-                </span>
+                <span>{money(row.product.price * row.qty)}</span>
               </div>
             ))}
           </div>

@@ -9,14 +9,15 @@ import { money } from "../../admin/utils/helpers";
 // Razorpay frontend configuration
 const RAZORPAY_KEY_ID = (import.meta.env.VITE_RAZORPAY_KEY_ID || "").trim();
 
-const PAYMENT_API = (
-  import.meta.env.VITE_PAYMENT_API_URL ||
-  (import.meta.env.DEV ? "http://localhost:5000" : "")
-)
-  .trim()
-  .replace(/\/+$/, "");
+const PAYMENT_API = import.meta.env.DEV
+  ? "http://localhost:5000"
+  : "";
 
 async function postPaymentRequest(path, body) {
+  
+  const PAYMENT_API = import.meta.env.DEV
+  ? "http://localhost:5000"
+  : "";
 
   let response;
   try {

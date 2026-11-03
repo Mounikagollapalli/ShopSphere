@@ -474,9 +474,30 @@
       "phone": "8121832648",
       "joinedAt": "2026-11-03",
       "id": "ooJm3Xw"
+    },
+    {
+      "name": "shivaparvathi",
+      "email": "mounikagollapalli06@gmail.com",
+      "password": "Shivakumar@123",
+      "phone": "",
+      "joinedAt": "2026-11-03",
+      "id": "rFZlLU8"
     }
   ],
-  "cart": [],
+  "cart": [
+    {
+      "userId": "rFZlLU8",
+      "productId": "5",
+      "qty": 1,
+      "id": 1
+    },
+    {
+      "userId": "wNSOjAb",
+      "productId": "1",
+      "qty": 2,
+      "id": 2
+    }
+  ],
   "wishlist": [],
   "orders": [
     {

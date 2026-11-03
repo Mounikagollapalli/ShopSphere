@@ -1,7 +1,10 @@
 {
   "$schema": "https://openapi.vercel.sh/vercel.json",
   "services": {
-    "app": { "root": ".", "framework": "vite" },
+    "app": {
+      "root": ".",
+      "framework": "vite"
+    },
     "payment-server": {
       "root": "payment-server",
       "framework": "express",
@@ -9,8 +12,19 @@
     }
   },
   "rewrites": [
-    { "source": "/api/payments/(.*)", "destination": { "service": "payment-server" } },
-    { "source": "/api/health", "destination": { "service": "payment-server" } },
-    { "source": "/(.*)", "destination": { "service": "app" } }
+    {
+      "source": "/api/payments/(.*)",
+      "destination": "https://shopsphere-payment.onrender.com/api/payments/$1"
+    },
+    {
+      "source": "/api/health",
+      "destination": "https://shopsphere-payment.onrender.com/api/health"
+    },
+    {
+      "source": "/(.*)",
+      "destination": {
+        "service": "app"
+      }
+    }
   ]
 }

@@ -159,7 +159,7 @@ function sendError(res, error, fallbackMessage) {
 
 // Liveness endpoint: this confirms the Node process is responding.
 // It deliberately does not depend on Razorpay or the data service.
-app.get("/api/health", (_req, res) => {
+const healthHandler = (_req, res) => {
   res.status(200).json({
     ok: true,
     service: "shopsphere-payment",
@@ -170,7 +170,11 @@ app.get("/api/health", (_req, res) => {
       process.env.RAZORPAY_KEY_ID && process.env.RAZORPAY_KEY_SECRET
     ),
   });
-});
+};
+
+app.get("/api/health", healthHandler);
+// A simple root response also makes basic platform probes succeed.
+app.get("/", healthHandler);
 
 app.post("/api/payments/create-order", async (req, res) => {
   try {

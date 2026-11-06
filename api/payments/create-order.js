@@ -1,4 +1,4 @@
-import crypto from "node:crypto";
+import catalog from "../../src/data/catalog.json" with { type: "json" };
 
 const json = (res, status, body) => res.status(status).json(body);
 
@@ -7,10 +7,10 @@ export default async function handler(req, res) {
 
   const keyId = process.env.RAZORPAY_KEY_ID;
   const keySecret = process.env.RAZORPAY_KEY_SECRET;
-  const dataUrl = (process.env.JSON_SERVER_URL || "").replace(/\/+$/, "");
 
-  if (!keyId || !keySecret) return json(res, 503, { ok: false, message: "Razorpay credentials are not configured in Vercel." });
-  if (!dataUrl) return json(res, 503, { ok: false, message: "Product data service is not configured." });
+  if (!keyId || !keySecret) {
+    return json(res, 503, { ok: false, message: "Razorpay credentials are not configured in Vercel." });
+  }
 
   const items = req.body?.items;
   if (!Array.isArray(items) || items.length === 0 || items.length > 30) {
@@ -26,23 +26,30 @@ export default async function handler(req, res) {
         return json(res, 400, { ok: false, message: "Invalid cart item." });
       }
       quantities.set(id, (quantities.get(id) || 0) + qty);
-      if (quantities.get(id) > 20) return json(res, 400, { ok: false, message: "Maximum quantity per product is 20." });
+      if (quantities.get(id) > 20) {
+        return json(res, 400, { ok: false, message: "Maximum quantity per product is 20." });
+      }
     }
 
     let total = 0;
     for (const [id, qty] of quantities) {
-      const response = await fetch(`${dataUrl}/products/${encodeURIComponent(id)}`, { signal: AbortSignal.timeout(10000) });
-      if (!response.ok) return json(res, response.status === 404 ? 400 : 502, { ok: false, message: "Could not validate a cart product. Please refresh and try again." });
-      const product = await response.json();
+      const product = catalog.products.find((item) => String(item.id) === id);
+      if (!product) return json(res, 400, { ok: false, message: "A cart product could not be found. Please refresh and try again." });
       const price = Number(product.price);
       const stock = Number(product.stock);
-      if (!Number.isFinite(price) || price <= 0) return json(res, 400, { ok: false, message: "A product has an invalid price." });
-      if (Number.isFinite(stock) && stock < qty) return json(res, 409, { ok: false, message: `Only ${stock} units of ${product.name || "this product"} are available.` });
+      if (!Number.isFinite(price) || price <= 0) {
+        return json(res, 400, { ok: false, message: "A product has an invalid price." });
+      }
+      if (Number.isFinite(stock) && stock < qty) {
+        return json(res, 409, { ok: false, message: `Only ${stock} units of ${product.name || "this product"} are available.` });
+      }
       total += price * qty;
     }
 
     const amount = Math.round(total * 100);
-    if (!Number.isSafeInteger(amount) || amount < 100) return json(res, 400, { ok: false, message: "Invalid payment amount." });
+    if (!Number.isSafeInteger(amount) || amount < 100) {
+      return json(res, 400, { ok: false, message: "Invalid payment amount." });
+    }
 
     const response = await fetch("https://api.razorpay.com/v1/orders", {
       method: "POST",

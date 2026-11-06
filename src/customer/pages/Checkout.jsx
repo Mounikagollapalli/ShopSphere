@@ -16,13 +16,9 @@ const RAZORPAY_KEY_ID = (
   import.meta.env.VITE_RAZORPAY_KEY_ID || ""
 ).trim();
 
-// Development: localhost payment backend.
-// Production: same-origin Vercel rewrite by default.
-// You can optionally provide VITE_PAYMENT_API_URL.
-const PAYMENT_API = (
-  import.meta.env.VITE_PAYMENT_API_URL ||
-  (import.meta.env.DEV ? "http://localhost:5000" : "")
-).replace(/\/+$/, "");
+// Payments run through this project's Vercel serverless functions.
+// Keep this same-origin so the browser never calls a Render backend.
+const PAYMENT_API = "";
 
 // --------------------------------------------------
 // PAYMENT API HELPER

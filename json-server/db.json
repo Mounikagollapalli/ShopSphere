@@ -482,6 +482,14 @@
       "phone": "",
       "joinedAt": "2026-11-03",
       "id": "rFZlLU8"
+    },
+    {
+      "name": "K MOKSHITH",
+      "email": "kolipakamokshith12@gmail.com",
+      "password": "Mokshith@123",
+      "phone": "",
+      "joinedAt": "2026-11-06",
+      "id": "tFM3ttm"
     }
   ],
   "cart": [
@@ -496,6 +504,36 @@
       "productId": "1",
       "qty": 2,
       "id": 2
+    },
+    {
+      "userId": "tFM3ttm",
+      "productId": "1",
+      "qty": 1,
+      "id": 3
+    },
+    {
+      "userId": "tFM3ttm",
+      "productId": "10",
+      "qty": 1,
+      "id": 4
+    },
+    {
+      "userId": "tFM3ttm",
+      "productId": "12",
+      "qty": 1,
+      "id": 5
+    },
+    {
+      "userId": "tFM3ttm",
+      "productId": "13",
+      "qty": 1,
+      "id": 6
+    },
+    {
+      "userId": "tFM3ttm",
+      "productId": "24",
+      "qty": 1,
+      "id": 7
     }
   ],
   "wishlist": [],

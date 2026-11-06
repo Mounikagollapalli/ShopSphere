@@ -1,30 +1,9 @@
 {
   "$schema": "https://openapi.vercel.sh/vercel.json",
-  "services": {
-    "app": {
-      "root": ".",
-      "framework": "vite"
-    },
-    "payment-server": {
-      "root": "payment-server",
-      "framework": "express",
-      "entrypoint": "server.js"
-    }
-  },
   "rewrites": [
     {
-      "source": "/api/payments/(.*)",
-      "destination": "https://shopsphere-payment.onrender.com/api/payments/$1"
-    },
-    {
-      "source": "/api/health",
-      "destination": "https://shopsphere-payment.onrender.com/api/health"
-    },
-    {
       "source": "/(.*)",
-      "destination": {
-        "service": "app"
-      }
+      "destination": "/index.html"
     }
   ]
 }

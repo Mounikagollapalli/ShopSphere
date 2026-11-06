@@ -43,7 +43,7 @@ async function postPaymentRequest(path, body) {
     console.error("Payment API connection error:", error);
 
     throw new Error(
-      "Unable to connect to the payment server. Check your Render backend and Vercel API rewrite configuration."
+      "Unable to connect to ShopSphere payment services. Please try again in a moment."
     );
   }
 
@@ -413,7 +413,7 @@ export default function Checkout() {
 
           // Save paid order.
           await saveOrder({
-            payment: "Razorpay (Test Mode)",
+            payment: RAZORPAY_KEY_ID.startsWith("rzp_live_") ? "Razorpay" : "Razorpay (Test Mode)",
             paymentStatus: "Paid",
 
             razorpayOrderId:

@@ -1,4 +1,4 @@
-import catalog from "../../src/data/catalog.json" with { type: "json" };
+import catalog from "../data/catalog.js";
 
 const json = (res, status, body) => res.status(status).json(body);
 

@@ -53,6 +53,7 @@ function localAdapter(config) {
     const collection = rawCollection === "customers" ? "users" : rawCollection;
     const id = idParts.length ? idParts.join("/") : null;
     const database = readDatabase();
+    const body = typeof config.data === "string" ? JSON.parse(config.data) : (config.data || {});
 
     if (!Object.prototype.hasOwnProperty.call(database, collection) ||
         !Array.isArray(database[collection])) {
@@ -86,7 +87,7 @@ function localAdapter(config) {
         }
       }
     } else if (method === "POST") {
-      const record = { ...(config.data || {}) };
+      const record = { ...body };
       if (record.id === undefined || record.id === null) record.id = makeId();
       records.push(record);
       data = record;
@@ -98,8 +99,8 @@ function localAdapter(config) {
         status = 404;
       } else {
         records[index] = method === "PATCH"
-          ? { ...records[index], ...(config.data || {}) }
-          : { ...(config.data || {}), id: records[index].id };
+          ? { ...records[index], ...body }
+          : { ...body, id: records[index].id };
         data = records[index];
         saveDatabase(database);
       }

@@ -1,18 +1,12 @@
-
-
 import { Routes, Route } from "react-router-dom";
 
 import CustomerLayout from "./customer/components/CustomerLayout.jsx";
 import Home from "./customer/pages/Home";
 import Shop from "./customer/pages/Shop";
 import ProductDetails from "./customer/pages/ProductDetails";
-import Login from "./customer/pages/Login";
-import Signup from "./customer/pages/Signup";
 import Cart from "./customer/pages/Cart";
 import Wishlist from "./customer/pages/Wishlist";
 import Checkout from "./customer/pages/Checkout";
-import MyOrders from "./customer/pages/MyOrders";
-import Spending from "./customer/pages/Spending";
 
 import AdminLayout from "./admin/AdminLayout";
 import Dashboard from "./admin/pages/Dashboard";
@@ -27,21 +21,15 @@ import Reports from "./admin/pages/Reports";
 export default function App() {
   return (
     <Routes>
-      {/* Part 1: Customer website */}
       <Route element={<CustomerLayout />}>
         <Route path="/" element={<Home />} />
         <Route path="/shop" element={<Shop />} />
         <Route path="/product/:id" element={<ProductDetails />} />
-        <Route path="/login" element={<Login />} />
-        <Route path="/signup" element={<Signup />} />
         <Route path="/cart" element={<Cart />} />
         <Route path="/wishlist" element={<Wishlist />} />
         <Route path="/checkout" element={<Checkout />} />
-        <Route path="/orders" element={<MyOrders />} />
-        <Route path="/spending" element={<Spending />} />
       </Route>
 
-      {/* Part 2: Admin dashboard */}
       <Route path="/admin" element={<AdminLayout />}>
         <Route index element={<Dashboard />} />
         <Route path="products" element={<Products />} />
@@ -52,17 +40,13 @@ export default function App() {
         <Route path="analytics" element={<Analytics />} />
         <Route path="reports" element={<Reports />} />
       </Route>
-      <Route
-        path="*"
-        element={
-          <main className="px-4 py-16 text-center">
-            <h1 className="text-2xl font-bold">Page not found</h1>
-            <a className="mt-4 inline-block text-indigo-600 underline" href="/">
-              Return home
-            </a>
-          </main>
-        }
-      />
+
+      <Route path="*" element={
+        <main className="px-4 py-16 text-center">
+          <h1 className="text-2xl font-bold">Page not found</h1>
+          <a className="mt-4 inline-block text-indigo-600 underline" href="/">Return home</a>
+        </main>
+      } />
     </Routes>
   );
 }

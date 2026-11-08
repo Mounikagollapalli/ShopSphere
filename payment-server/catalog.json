@@ -1,0 +1,202 @@
+{
+  "products": [
+    {
+      "id": "1",
+      "name": "iPhone 17 Pro Max",
+      "price": 149900,
+      "stock": 19
+    },
+    {
+      "id": "2",
+      "name": "Samsung Galaxy S25 Ultra",
+      "price": 129999,
+      "stock": 18
+    },
+    {
+      "id": "3",
+      "name": "OnePlus 13",
+      "price": 69999,
+      "stock": 30
+    },
+    {
+      "id": "4",
+      "name": "Google Pixel 10",
+      "price": 79999,
+      "stock": 0
+    },
+    {
+      "id": "5",
+      "name": "MacBook Air M4",
+      "price": 99900,
+      "stock": 13
+    },
+    {
+      "id": "6",
+      "name": "Dell XPS 14",
+      "price": 149999,
+      "stock": 7
+    },
+    {
+      "id": "7",
+      "name": "HP Pavilion",
+      "price": 65000,
+      "stock": 22
+    },
+    {
+      "id": "8",
+      "name": "Lenovo Legion Pro 7",
+      "price": 119999,
+      "stock": 7
+    },
+    {
+      "id": "9",
+      "name": "AirPods Pro",
+      "price": 25900,
+      "stock": 40
+    },
+    {
+      "id": "10",
+      "name": "Sony WH-1000XM6",
+      "price": 39990,
+      "stock": 25
+    },
+    {
+      "id": "11",
+      "name": "boAt Airdopes",
+      "price": 1499,
+      "stock": 120
+    },
+    {
+      "id": "12",
+      "name": "Galaxy Buds3 Pro",
+      "price": 19999,
+      "stock": 35
+    },
+    {
+      "id": "13",
+      "name": "Apple Watch Series 11",
+      "price": 46900,
+      "stock": 6
+    },
+    {
+      "id": "14",
+      "name": "Samsung Galaxy Watch8",
+      "price": 32999,
+      "stock": 20
+    },
+    {
+      "id": "15",
+      "name": "Noise ColorFit Caliber",
+      "price": 2499,
+      "stock": 80
+    },
+    {
+      "id": "16",
+      "name": "Garmin Forerunner 265",
+      "price": 35000,
+      "stock": 12
+    },
+    {
+      "id": "17",
+      "name": "iPad Air",
+      "price": 59900,
+      "stock": 18
+    },
+    {
+      "id": "18",
+      "name": "Samsung Galaxy Tab S10 Ultra",
+      "price": 108999,
+      "stock": 9
+    },
+    {
+      "id": "19",
+      "name": "OnePlus Pad 2",
+      "price": 39999,
+      "stock": 25
+    },
+    {
+      "id": "20",
+      "name": "Lenovo Tab P12",
+      "price": 24999,
+      "stock": 4
+    },
+    {
+      "id": "21",
+      "name": "Anker Power Bank 20000mAh",
+      "price": 2499,
+      "stock": 60
+    },
+    {
+      "id": "22",
+      "name": "Apple 35W Dual USB-C Charger",
+      "price": 3900,
+      "stock": 44
+    },
+    {
+      "id": "23",
+      "name": "Logitech MK270 Keyboard and Mouse",
+      "price": 2999,
+      "stock": 50
+    },
+    {
+      "id": "24",
+      "name": "SanDisk E61 External SSD 1TB",
+      "price": 8999,
+      "stock": 30
+    },
+    {
+      "id": "25",
+      "name": "Sony Bravia 55 inch 4K TV",
+      "price": 89999,
+      "stock": 10
+    },
+    {
+      "id": "26",
+      "name": "Samsung QLED 55 inch TV",
+      "price": 74999,
+      "stock": 11
+    },
+    {
+      "id": "27",
+      "name": "JBL Bar 800 Soundbar",
+      "price": 19999,
+      "stock": 16
+    },
+    {
+      "id": "28",
+      "name": "Epson Home Projector",
+      "price": 55000,
+      "stock": 5
+    },
+    {
+      "id": "29",
+      "name": "PlayStation 5 Slim",
+      "price": 49990,
+      "stock": 14
+    },
+    {
+      "id": "30",
+      "name": "Xbox Series X",
+      "price": 54990,
+      "stock": 9
+    },
+    {
+      "id": "31",
+      "name": "Logitech G102 Gaming Mouse",
+      "price": 4999,
+      "stock": 70
+    },
+    {
+      "id": "32",
+      "name": "Mechanical Gaming Keyboard",
+      "price": 5999,
+      "stock": 40
+    },
+    {
+      "id": "ly_Eie8",
+      "name": "Refrigerators",
+      "price": 93490,
+      "stock": 3
+    }
+  ]
+}

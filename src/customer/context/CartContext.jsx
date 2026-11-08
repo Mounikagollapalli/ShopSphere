@@ -1,115 +1,70 @@
-import { createContext, useContext, useEffect, useState, useCallback } from "react";
-import api from "../../api/axios";
-import { useAuth } from "./AuthContext";
+import { createContext, useContext, useEffect, useState } from "react";
 
 const CartContext = createContext(null);
+const CART_KEY = "shopsphere_guest_cart";
+const WISHLIST_KEY = "shopsphere_guest_wishlist";
 
-async function fetchCartData(uid) {
-  if (!uid) return { cart: [], wishlist: [] };
-
-  const [cart, wishlist] = await Promise.allSettled([
-    api.get("/cart", { params: { userId: uid } }),
-    api.get("/wishlist", { params: { userId: uid } }),
-  ]);
-  return {
-    cart: cart.status === "fulfilled" ? cart.value.data : [],
-    wishlist: wishlist.status === "fulfilled" ? wishlist.value.data : [],
-  };
+function readItems(key) {
+  try {
+    const value = JSON.parse(localStorage.getItem(key) || "[]");
+    return Array.isArray(value) ? value : [];
+  } catch {
+    return [];
+  }
 }
 
 export function CartProvider({ children }) {
-  const { user } = useAuth();
-  const uid = user?.id;
+  const [cart, setCart] = useState(() => readItems(CART_KEY));
+  const [wishlist, setWishlist] = useState(() => readItems(WISHLIST_KEY));
 
-  const [cart, setCart] = useState([]);
-  const [wishlist, setWishlist] = useState([]);
+  useEffect(() => localStorage.setItem(CART_KEY, JSON.stringify(cart)), [cart]);
+  useEffect(() => localStorage.setItem(WISHLIST_KEY, JSON.stringify(wishlist)), [wishlist]);
 
-  // Load this user's cart and wishlist from JSON Server
-  const load = useCallback(async () => {
-    const data = await fetchCartData(uid);
-    setCart(data.cart);
-    setWishlist(data.wishlist);
-  }, [uid]);
-
-  useEffect(() => {
-    let active = true;
-    fetchCartData(uid).then((data) => {
-      if (active) {
-        setCart(data.cart);
-        setWishlist(data.wishlist);
-      }
-    });
-    return () => {
-      active = false;
-    };
-  }, [uid]);
-
-  // ---------- Cart ----------
-  // Returns false when the user is not logged in
   const addToCart = async (product, qty = 1) => {
-    if (!uid) return false;
-    const max = product.stock ?? 99;
-    const existing = cart.find((i) => String(i.productId) === String(product.id));
-
-    if (existing) {
-      const newQty = Math.min(existing.qty + qty, max);
-      await api.patch(`/cart/${existing.id}`, { qty: newQty });
-    } else {
-      await api.post("/cart", { userId: uid, productId: product.id, qty: Math.min(qty, max) });
-    }
-    await load();
+    const max = Number(product.stock ?? 99);
+    setCart((current) => {
+      const existing = current.find((item) => String(item.productId) === String(product.id));
+      if (existing) return current.map((item) =>
+        String(item.productId) === String(product.id)
+          ? { ...item, qty: Math.min(Number(item.qty) + qty, max) }
+          : item
+      );
+      return [...current, { id: String(product.id), productId: product.id, qty: Math.min(qty, max) }];
+    });
     return true;
   };
 
   const updateQty = async (itemId, qty) => {
-    if (qty < 1) await api.delete(`/cart/${itemId}`);
-    else await api.patch(`/cart/${itemId}`, { qty });
-    await load();
+    setCart((current) => qty < 1
+      ? current.filter((item) => String(item.id) !== String(itemId))
+      : current.map((item) => String(item.id) === String(itemId) ? { ...item, qty } : item));
   };
 
   const removeFromCart = async (itemId) => {
-    await api.delete(`/cart/${itemId}`);
-    await load();
+    setCart((current) => current.filter((item) => String(item.id) !== String(itemId)));
   };
 
-  const clearCart = async () => {
-    await Promise.all(cart.map((i) => api.delete(`/cart/${i.id}`)));
-    await load();
-  };
+  const clearCart = async () => setCart([]);
 
-  // ---------- Wishlist ----------
-  // Returns false when the user is not logged in
   const toggleWishlist = async (product) => {
-    if (!uid) return false;
-    const existing = wishlist.find((i) => String(i.productId) === String(product.id));
-    if (existing) await api.delete(`/wishlist/${existing.id}`);
-    else await api.post("/wishlist", { userId: uid, productId: product.id });
-    await load();
+    setWishlist((current) => current.some((item) => String(item.productId) === String(product.id))
+      ? current.filter((item) => String(item.productId) !== String(product.id))
+      : [...current, { id: String(product.id), productId: product.id }]);
     return true;
   };
 
   const isWished = (productId) =>
-    wishlist.some((i) => String(i.productId) === String(productId));
+    wishlist.some((item) => String(item.productId) === String(productId));
 
-  const cartCount = cart.reduce((sum, i) => sum + i.qty, 0);
+  const cartCount = cart.reduce((sum, item) => sum + Number(item.qty || 0), 0);
   const wishCount = wishlist.length;
 
   return (
-    <CartContext.Provider
-      value={{
-        cart,
-        wishlist,
-        cartCount,
-        wishCount,
-        addToCart,
-        updateQty,
-        removeFromCart,
-        clearCart,
-        toggleWishlist,
-        isWished,
-        reload: load,
-      }}
-    >
+    <CartContext.Provider value={{
+      cart, wishlist, cartCount, wishCount, addToCart, updateQty,
+      removeFromCart, clearCart, toggleWishlist, isWished,
+      reload: async () => {},
+    }}>
       {children}
     </CartContext.Provider>
   );

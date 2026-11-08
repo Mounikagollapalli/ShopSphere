@@ -7,7 +7,7 @@ const STATUSES = ["Pending", "Processing", "Shipped", "Delivered", "Cancelled"];
 export default function Orders() {
   const { orders, customers, loading, reload } = useShopData();
 
-  const customerName = (id) => customers.find((c) => String(c.id) === String(id))?.name || "Unknown";
+  const customerName = (id) => id === "Guest" ? "Guest Customer" : customers.find((c) => String(c.id) === String(id))?.name || "Unknown";
 
   const updateStatus = async (id, status) => {
     await api.patch(`/orders/${id}`, { status });

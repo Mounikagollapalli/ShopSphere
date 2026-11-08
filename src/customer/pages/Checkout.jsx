@@ -2,7 +2,6 @@
 import { useState } from "react";
 import { Link } from "react-router-dom";
 
-import api from "../../api/axios";
 import useCatalog from "../hooks/useCatalog";
 import { useCart } from "../context/CartContext";
 import { money } from "../../admin/utils/helpers";
@@ -186,34 +185,19 @@ export default function Checkout() {
   // ------------------------------------------------
 
   const saveOrder = async (paymentDetails = {}) => {
-    // Get the latest product details from JSON Server.
-    const latestProducts = await Promise.all(
-      rows.map(async (row) => {
-        const response = await api.get(
-          `/products/${row.product.id}`
-        );
-
-        return response.data;
-      })
-    );
-
-    // Check product stock.
-    for (let index = 0; index < latestProducts.length; index++) {
-      const product = latestProducts[index];
-      const requestedQty = rows[index].qty;
-
-      if (Number(product.stock) < requestedQty) {
+    // Validate quantities against the bundled demo catalogue.
+    for (const row of rows) {
+      if (Number(row.product.stock) < row.qty) {
         throw new Error(
-          `Only ${product.stock} units of "${product.name}" are available. Please update your cart.`
+          `Only ${row.product.stock} units of "${row.product.name}" are available. Please update your cart.`
         );
       }
     }
 
-    // Prepare order items using latest product prices.
-    const orderItems = rows.map((row, index) => ({
-      productId: latestProducts[index].id,
+    const orderItems = rows.map((row) => ({
+      productId: row.product.id,
       qty: row.qty,
-      price: Number(latestProducts[index].price),
+      price: Number(row.product.price),
     }));
 
     const orderTotal = orderItems.reduce(
@@ -221,20 +205,15 @@ export default function Checkout() {
       0
     );
 
-    // Create customer order.
     const orderPayload = {
+      id: `SS-${Date.now()}`,
       customerId: "Guest",
       date: new Date().toISOString().slice(0, 10),
       status: "Pending",
       total: orderTotal,
       items: orderItems,
-
-      payment:
-        paymentDetails.payment || "Cash on Delivery",
-
-      paymentStatus:
-        paymentDetails.paymentStatus || "Pending",
-
+      payment: paymentDetails.payment || "Cash on Delivery",
+      paymentStatus: paymentDetails.paymentStatus || "Pending",
       shipping: {
         name: form.name.trim(),
         phone: form.phone.trim(),
@@ -242,52 +221,41 @@ export default function Checkout() {
         city: form.city.trim(),
         pincode: form.pincode.trim(),
       },
-
       ...(paymentDetails.razorpayOrderId && {
         razorpayOrderId: paymentDetails.razorpayOrderId,
       }),
-
       ...(paymentDetails.razorpayPaymentId && {
         razorpayPaymentId: paymentDetails.razorpayPaymentId,
       }),
     };
 
-    const response = await api.post("/orders", orderPayload);
-    const savedOrder = response.data;
+    // This demo stores guest orders in this browser so checkout and admin
+    // order review do not depend on a sleeping external JSON server.
+    try {
+      const existing = JSON.parse(
+        localStorage.getItem("shopsphere_guest_orders") || "[]"
+      );
+      const savedOrders = Array.isArray(existing) ? existing : [];
+      localStorage.setItem(
+        "shopsphere_guest_orders",
+        JSON.stringify([orderPayload, ...savedOrders])
+      );
+    } catch (storageError) {
+      console.error("Could not save the guest order locally:", storageError);
+      throw new Error("Your order could not be saved in this browser. Please check available browser storage and try again.");
+    }
 
-    // Show success before optional follow-up operations.
-    setPlacedOrder(savedOrder);
+    setPlacedOrder(orderPayload);
     setError("");
     setBusy(false);
 
-    // Update product stock.
-    try {
-      await Promise.all(
-        latestProducts.map((product, index) =>
-          api.patch(`/products/${product.id}`, {
-            stock:
-              Number(product.stock) - rows[index].qty,
-          })
-        )
-      );
-    } catch (stockError) {
-      console.error(
-        "Order saved, but stock update failed:",
-        stockError
-      );
-    }
-
-    // Clear cart.
     try {
       await clearCart();
     } catch (cartError) {
-      console.error(
-        "Order saved, but cart clearing failed:",
-        cartError
-      );
+      console.error("Order saved, but cart clearing failed:", cartError);
     }
 
-    return savedOrder;
+    return orderPayload;
   };
 
   // ------------------------------------------------
@@ -519,7 +487,7 @@ export default function Checkout() {
           </Link>
 
           <Link
-            to="/orders"
+            to="/admin/orders"
             state={{ placed: placedOrder.id }}
             className="rounded-lg border border-slate-300 px-5 py-2.5 font-semibold text-slate-700 hover:bg-slate-50"
           >

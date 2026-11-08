@@ -3,7 +3,13 @@
   "services": {
     "app": {
       "root": ".",
-      "framework": "vite"
+      "framework": "vite",
+      "rewrites": [
+        {
+          "source": "/(.*)",
+          "destination": "/index.html"
+        }
+      ]
     },
     "payment-server": {
       "root": "payment-server",
@@ -14,11 +20,15 @@
   "rewrites": [
     {
       "source": "/api/payments/(.*)",
-      "destination": "https://shopsphere-payment.onrender.com/api/payments/$1"
+      "destination": {
+        "service": "payment-server"
+      }
     },
     {
       "source": "/api/health",
-      "destination": "https://shopsphere-payment.onrender.com/api/health"
+      "destination": {
+        "service": "payment-server"
+      }
     },
     {
       "source": "/(.*)",

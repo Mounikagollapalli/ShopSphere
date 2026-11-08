@@ -1,13 +1,11 @@
 
 import { useState } from "react";
-import axios from "axios";
 import useShopData from "../hooks/useShopData";
 import { money, validOrders } from "../utils/helpers";
 
-const API = import.meta.env.VITE_API_URL;
 
 export default function Customers() {
-  const { customers, orders, loading } = useShopData();
+  const { customers, orders, loading, saveCustomer, reload } = useShopData();
 
   const [editingCustomer, setEditingCustomer] = useState(null);
   const [form, setForm] = useState({
@@ -40,16 +38,11 @@ export default function Customers() {
     try {
       setSaving(true);
 
-      await axios.patch(
-        `${API}/customers/${editingCustomer.id}`,
-        form
-      );
+      saveCustomer({ ...editingCustomer, ...form });
 
       alert("Customer details updated successfully!");
-
       setEditingCustomer(null);
-
-      window.location.reload();
+      reload();
     } catch (error) {
       console.error("Update customer error:", error);
       alert("Failed to update customer details.");

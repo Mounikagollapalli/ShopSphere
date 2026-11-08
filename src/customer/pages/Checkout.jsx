@@ -486,13 +486,6 @@ export default function Checkout() {
             Start Shopping
           </Link>
 
-          <Link
-            to="/admin/orders"
-            state={{ placed: placedOrder.id }}
-            className="rounded-lg border border-slate-300 px-5 py-2.5 font-semibold text-slate-700 hover:bg-slate-50"
-          >
-            View My Orders
-          </Link>
         </div>
       </div>
     );

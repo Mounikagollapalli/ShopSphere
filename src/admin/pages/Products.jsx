@@ -1,5 +1,4 @@
 import { useState } from "react";
-import api from "../../api/axios";
 import useShopData from "../hooks/useShopData";
 import Modal from "../components/Modal";
 import { money } from "../utils/helpers";
@@ -82,7 +81,7 @@ function SafeImage({ src, name, className }) {
 }
 
 export default function Products() {
-  const { products, categories, loading, reload } = useShopData();
+  const { products, categories, loading, reload, saveProduct, deleteProduct } = useShopData();
   const [q, setQ] = useState("");
   const [form, setForm] = useState(null);
 
@@ -96,8 +95,7 @@ export default function Products() {
     e.preventDefault();
     const body = { ...form, price: Number(form.price), stock: Number(form.stock) };
     try {
-      if (form.id) await api.put(`/products/${form.id}`, body);
-      else await api.post("/products", body);
+      saveProduct(body);
       setForm(null);
       reload();
     } catch {
@@ -108,7 +106,7 @@ export default function Products() {
   const remove = async (id) => {
     if (window.confirm("Are you sure you want to delete this product?")) {
       try {
-        await api.delete(`/products/${id}`);
+        deleteProduct(id);
         reload();
       } catch {
         alert("Unable to delete product.");

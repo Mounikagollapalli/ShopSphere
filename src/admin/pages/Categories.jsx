@@ -1,9 +1,8 @@
 import { useState } from "react";
-import api from "../../api/axios";
 import useShopData from "../hooks/useShopData";
 
 export default function Categories() {
-  const { categories, products, loading, reload } = useShopData();
+  const { categories, products, loading, reload, saveCategory, deleteCategory } = useShopData();
   const [name, setName] = useState("");
   const [editId, setEditId] = useState(null);
   const [error, setError] = useState("");
@@ -28,12 +27,12 @@ export default function Categories() {
     if (duplicate) return setError("This category already exists.");
 
     try {
-      if (editId) await api.put(`/categories/${editId}`, { id: editId, name: clean });
-      else await api.post("/categories", { name: clean });
+      if (editId) saveCategory({ id: editId, name: clean });
+      else saveCategory({ name: clean });
       resetForm();
       reload();
     } catch (err) {
-      setError("Could not save. Is JSON Server running and does /categories exist?");
+      setError("Could not save this category. Please try again.");
       console.error(err);
     }
   };
@@ -50,7 +49,7 @@ export default function Categories() {
     }
     if (!window.confirm(`Delete category "${c.name}"?`)) return;
     try {
-      await api.delete(`/categories/${c.id}`);
+      deleteCategory(c.id);
       if (String(editId) === String(c.id)) resetForm();
       reload();
     } catch (err) {

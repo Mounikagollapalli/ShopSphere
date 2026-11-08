@@ -1,10 +1,9 @@
 
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { Link } from "react-router-dom";
 
 import api from "../../api/axios";
 import useCatalog from "../hooks/useCatalog";
-import { useAuth } from "../context/AuthContext";
 import { useCart } from "../context/CartContext";
 import { money } from "../../admin/utils/helpers";
 
@@ -43,7 +42,7 @@ async function postPaymentRequest(path, body) {
     console.error("Payment API connection error:", error);
 
     throw new Error(
-      "Unable to connect to the payment server. Check your Render backend and Vercel API rewrite configuration."
+      "Unable to connect to the payment server. Check your payment API configuration."
     );
   }
 
@@ -119,7 +118,6 @@ function loadRazorpayScript() {
 // --------------------------------------------------
 
 export default function Checkout() {
-  const { user } = useAuth();
   const { cart, clearCart } = useCart();
   const { products, loading } = useCatalog();
 
@@ -135,20 +133,6 @@ export default function Checkout() {
   const [error, setError] = useState("");
   const [busy, setBusy] = useState(false);
   const [placedOrder, setPlacedOrder] = useState(null);
-
-  // ------------------------------------------------
-  // PREFILL CUSTOMER DETAILS
-  // ------------------------------------------------
-
-  useEffect(() => {
-    if (user) {
-      setForm((previous) => ({
-        ...previous,
-        name: previous.name || user.name || "",
-        phone: previous.phone || user.phone || "",
-      }));
-    }
-  }, [user]);
 
   // ------------------------------------------------
   // HANDLE FORM INPUTS
@@ -239,7 +223,7 @@ export default function Checkout() {
 
     // Create customer order.
     const orderPayload = {
-      customerId: user.id,
+      customerId: "Guest",
       date: new Date().toISOString().slice(0, 10),
       status: "Pending",
       total: orderTotal,
@@ -290,19 +274,6 @@ export default function Checkout() {
       console.error(
         "Order saved, but stock update failed:",
         stockError
-      );
-    }
-
-    // Update customer profile.
-    try {
-      await api.patch(`/users/${user.id}`, {
-        name: form.name.trim(),
-        phone: form.phone.trim(),
-      });
-    } catch (profileError) {
-      console.error(
-        "Order saved, but profile update failed:",
-        profileError
       );
     }
 
@@ -380,12 +351,12 @@ export default function Checkout() {
 
       prefill: {
         name: form.name.trim(),
-        email: user.email || "",
+        email: "",
         contact: form.phone.trim(),
       },
 
       notes: {
-        customerId: String(user.id),
+        customerId: "Guest",
       },
 
       theme: {
@@ -512,28 +483,6 @@ export default function Checkout() {
 
   const input =
     "w-full rounded-lg border border-slate-300 px-3 py-2 text-sm outline-none focus:border-indigo-500 focus:ring-2 focus:ring-indigo-100";
-
-  // ------------------------------------------------
-  // LOGIN CHECK
-  // ------------------------------------------------
-
-  if (!user) {
-    return (
-      <div className="py-16 text-center">
-        <p className="mb-4 text-slate-600">
-          Please login to checkout.
-        </p>
-
-        <Link
-          to="/login"
-          state={{ from: "/checkout" }}
-          className="rounded-lg bg-indigo-600 px-5 py-2.5 font-semibold text-white"
-        >
-          Login
-        </Link>
-      </div>
-    );
-  }
 
   // ------------------------------------------------
   // SUCCESS SCREEN

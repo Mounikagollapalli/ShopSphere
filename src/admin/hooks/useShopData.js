@@ -1,51 +1,42 @@
-import { useEffect, useState, useCallback } from "react";
-import api from "../../api/axios";
-
-async function fetchShopData() {
-  const names = ["products", "categories", "orders", "users"];
-  const results = await Promise.allSettled(names.map((name) => api.get(`/${name}`)));
-  const get = (index) =>
-    results[index].status === "fulfilled" ? results[index].value.data : [];
-
-  results.forEach((result, index) => {
-    if (result.status === "rejected") {
-      console.warn(`Could not load /${names[index]}`, result.reason);
-    }
-  });
-
-  return {
-    products: get(0),
-    categories: get(1),
-    orders: get(2),
-    customers: get(3),
-  };
-}
+import { useCallback, useEffect, useState } from "react";
+import {
+  readShopData,
+  saveProduct,
+  deleteProduct,
+  saveCategory,
+  deleteCategory,
+  updateProductStock,
+  saveCustomer,
+} from "../utils/localStore";
 
 export default function useShopData() {
-  const [data, setData] = useState({ products: [], categories: [], orders: [], customers: [] });
-  const [loading, setLoading] = useState(true);
+  const [data, setData] = useState(readShopData);
+  const [loading, setLoading] = useState(false);
 
-  const load = useCallback(async () => {
-    setLoading(true);
-    try {
-      setData(await fetchShopData());
-    } finally {
-      setLoading(false);
-    }
+  const reload = useCallback(() => {
+    setData(readShopData());
+    setLoading(false);
   }, []);
 
   useEffect(() => {
-    let active = true;
-    fetchShopData().then((shopData) => {
-      if (active) {
-        setData(shopData);
-        setLoading(false);
-      }
-    });
+    const sync = () => setData(readShopData());
+    window.addEventListener("shopsphere:data-updated", sync);
+    window.addEventListener("storage", sync);
     return () => {
-      active = false;
+      window.removeEventListener("shopsphere:data-updated", sync);
+      window.removeEventListener("storage", sync);
     };
   }, []);
 
-  return { ...data, loading, reload: load };
+  return {
+    ...data,
+    loading,
+    reload,
+    saveProduct,
+    deleteProduct,
+    saveCategory,
+    deleteCategory,
+    updateProductStock,
+    saveCustomer,
+  };
 }

@@ -3,14 +3,12 @@ import express from "express";
 import cors from "cors";
 import crypto from "node:crypto";
 import Razorpay from "razorpay";
+import catalog from "./catalog.json" with { type: "json" };
 
 const app = express();
 const PORT = Number(process.env.PORT) || 5000;
 
-const DATA_URL = (
-  process.env.JSON_SERVER_URL ||
-  (process.env.NODE_ENV !== "production" ? "http://localhost:3000" : "")
-).replace(/\/+$/, "");
+const PRODUCTS = Array.isArray(catalog.products) ? catalog.products : [];
 
 const configuredOrigins = (process.env.FRONTEND_URL || "http://localhost:5173")
   .split(",")
@@ -99,44 +97,8 @@ function withTimeout(promise, timeoutMs, label) {
   ]).finally(() => clearTimeout(timeout));
 }
 
-async function fetchProduct(productId) {
-  if (!DATA_URL) {
-    const error = new Error("Product data service is not configured.");
-    error.statusCode = 503;
-    throw error;
-  }
-
-  let lastError;
-
-  // Product lookups are safe GET requests, so retry once after a brief delay.
-  for (let attempt = 1; attempt <= 2; attempt += 1) {
-    try {
-      const response = await fetch(
-        DATA_URL + "/products/" + encodeURIComponent(productId),
-        { signal: AbortSignal.timeout(12000) }
-      );
-
-      if (response.status === 404) return null;
-
-      if (!response.ok) {
-        const error = new Error("Product data service returned HTTP " + response.status + ".");
-        error.statusCode = response.status >= 500 ? 502 : 400;
-        throw error;
-      }
-
-      return await response.json();
-    } catch (error) {
-      lastError = error;
-      if (attempt < 2) {
-        await new Promise((resolve) => setTimeout(resolve, 500));
-      }
-    }
-  }
-
-  const error = new Error("Product data service is temporarily unavailable. Please try again.");
-  error.statusCode = lastError?.name === "TimeoutError" || lastError?.code === "ETIMEDOUT" ? 504 : 502;
-  error.cause = lastError;
-  throw error;
+function fetchProduct(productId) {
+  return PRODUCTS.find((product) => String(product.id) === String(productId)) || null;
 }
 
 function sendError(res, error, fallbackMessage) {
@@ -165,7 +127,7 @@ const healthHandler = (_req, res) => {
     service: "shopsphere-payment",
     uptimeSeconds: Math.floor(process.uptime()),
     timestamp: new Date().toISOString(),
-    dataConfigured: Boolean(DATA_URL),
+    catalogConfigured: PRODUCTS.length > 0,
     razorpayConfigured: Boolean(
       process.env.RAZORPAY_KEY_ID && process.env.RAZORPAY_KEY_SECRET
     ),
@@ -178,13 +140,6 @@ app.get("/", healthHandler);
 
 app.post("/api/payments/create-order", async (req, res) => {
   try {
-    if (!DATA_URL) {
-      return res.status(503).json({
-        ok: false,
-        message: "Product data service is not configured.",
-      });
-    }
-
     if (!Array.isArray(req.body?.items) || req.body.items.length === 0) {
       return res.status(400).json({ ok: false, message: "Cart is empty." });
     }

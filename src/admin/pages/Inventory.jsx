@@ -1,5 +1,4 @@
 import { useState } from "react";
-import api from "../../api/axios";
 import useShopData from "../hooks/useShopData";
 
 const badge = (s) =>
@@ -10,12 +9,12 @@ const badge = (s) =>
     : ["In stock", "bg-green-100 text-green-700"];
 
 export default function Inventory() {
-  const { products, loading, reload } = useShopData();
+  const { products, loading, reload, updateProductStock } = useShopData();
   const [edits, setEdits] = useState({});
 
   const update = async (id) => {
     if (edits[id] === undefined) return;
-    await api.patch(`/products/${id}`, { stock: Number(edits[id]) });
+    updateProductStock(id, Number(edits[id]));
     setEdits({ ...edits, [id]: undefined });
     reload();
   };

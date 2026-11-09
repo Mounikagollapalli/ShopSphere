@@ -1,113 +1,54 @@
 # ShopSphere – Smart E-Commerce Platform
 
-ShopSphere is a React e-commerce application with a customer storefront and an admin dashboard. It uses JSON Server for demo product, customer, cart, wishlist and order data.
+ShopSphere is a React + Vite e-commerce demo with a customer storefront and an admin dashboard.
 
 ## Tech stack
+
 - React + Vite
-- Tailwind CSS and Axios
-- JSON Server
-- Recharts
+- Tailwind CSS and Recharts
+- Browser storage for demo accounts, cart, wishlist, products, and orders
+- Vercel Serverless Functions for Razorpay order creation and payment verification
 - Razorpay Checkout (Test Mode)
-- Node.js + Express payment API and Razorpay Node SDK
 
 ## Run locally
 
-Open the ShopSphere project folder in VS Code. Start three separate terminals. Keep all three running.
+1. Install dependencies: `npm install`
+2. Create a root `.env` file using `.env.example`.
+3. Set `VITE_RAZORPAY_KEY_ID` to your Razorpay Test Key ID.
+4. Start the app: `npm run dev`.
 
-### 1. Start the data server
+The Razorpay API functions run on Vercel. For local payment testing, deploy a Preview build or use the Vercel CLI with the private environment variables configured.
 
-In the first terminal, stay in the main ShopSphere project folder and run:
+## Vercel environment variables
 
-```bash
-npm install
-npm run server
-```
+Configure these in the Vercel project for both Preview and Production:
 
-This starts JSON Server using `json-server/db.json` at `http://localhost:3000`.
+- `VITE_RAZORPAY_KEY_ID`: Razorpay Test Key ID. This is the public checkout key.
+- `RAZORPAY_KEY_ID`: Razorpay Test Key ID for the serverless function.
+- `RAZORPAY_KEY_SECRET`: Razorpay Test Key Secret. Keep this private; never prefix it with `VITE_` and never commit it to GitHub.
 
-### 2. Start the Razorpay payment server
-
-In the second terminal, run:
-
-```bash
-cd payment-server
-npm install
-```
-
-Create a file named `.env` inside the `payment-server` folder. Copy the variable names from `payment-server/.env.example` and add your own Razorpay **Test Mode** credentials:
-
-```env
-PORT=5000
-RAZORPAY_KEY_ID=rzp_test_your_actual_key_id
-RAZORPAY_KEY_SECRET=your_actual_test_key_secret
-JSON_SERVER_URL=http://localhost:3000
-FRONTEND_URL=http://localhost:5173
-```
-
-Save the file, then run:
-
-```bash
-npm run dev
-```
-
-The payment server runs at `http://localhost:5000`. You can check it at `http://localhost:5000/api/health`; it should return `{"ok":true}`.
-
-### 3. Start the ShopSphere website
-
-In the third terminal, go back to the main ShopSphere project folder:
-
-```bash
-cd ..
-```
-
-If this terminal is already in the main project folder, do not run `cd ..`.
-
-Create a file named `.env` in the main project folder (the same folder as the root `package.json`). Copy the variable names from `.env.example` and set your Razorpay Test Key ID:
-
-```env
-VITE_API_URL=http://localhost:3000
-VITE_PAYMENT_API_URL=http://localhost:5000
-VITE_RAZORPAY_KEY_ID=rzp_test_your_actual_key_id
-```
-
-Run:
-
-```bash
-npm run dev
-```
-
-Open the local website shown by Vite, usually `http://localhost:5173`.
-
-## Razorpay Test Mode
-
-1. Sign in to the Razorpay Dashboard and switch to **Test Mode**.
-2. Open **Account & Settings → API Keys** and generate a Test Key pair.
-3. Put the Test Key ID and Test Key Secret in `payment-server/.env`.
-4. Put only the Test Key ID in the root `.env` as `VITE_RAZORPAY_KEY_ID`.
-5. Restart both the payment server and Vite after changing environment variables.
-
-Use Razorpay's test payment details when checking out. Test Mode simulates payments; it does not charge real money.
+After changing environment variables, create a new deployment.
 
 ## Payment flow
 
-1. Checkout sends product IDs and quantities to the payment server.
-2. The payment server reads current prices and stock from JSON Server and creates a Razorpay order in paise.
-3. Razorpay Checkout opens in the browser.
-4. The payment server verifies the payment signature using the secret key.
-5. After successful verification, the frontend saves the order, updates customer details and stock, clears the cart, and opens the Orders page.
-6. Cash on Delivery remains available.
+1. Checkout sends product IDs and quantities to `/api/payments/create-order`.
+2. The Vercel function validates products, prices, and stock against the server-side demo catalogue.
+3. The function creates a Razorpay order using the private server-side credentials.
+4. Razorpay Checkout opens in the browser.
+5. Checkout sends the payment response to `/api/payments/verify`.
+6. The Vercel function checks the HMAC signature and confirms the payment and order with Razorpay.
+7. Only after verification does the storefront save the paid order, clear the cart, and show the **Start Shopping** link.
 
-**Never put `RAZORPAY_KEY_SECRET` in React code, a `VITE_*` variable, GitHub, or Vercel frontend environment variables.** Keep it only in the payment server's private environment settings.
+Health check: `/api/health`.
 
-## Security and demo limitations
+## Demo data and limitations
 
-- This project uses JSON Server as a learning/demo API. Do not store real customer information in it.
-- The current demo login is not production-grade authentication. Use only synthetic test accounts and never reuse a real password.
-- Order creation, customer updates, and stock changes are initiated by the browser against JSON Server. A production system needs authenticated backend endpoints, password hashing, authorization, database transactions, and server-side order persistence.
-- Keep all `.env` files and secret credentials out of GitHub.
+- Products, demo accounts, cart, wishlist, and orders are stored in the current browser. They are not shared between different browsers or devices.
+- Demo account credentials are stored locally in the browser and are not production authentication.
+- The catalogue used for server-side payment validation is `payment-server/catalog.json`. Keep its prices aligned with the storefront catalogue when editing demo products.
+- Use Razorpay Test Mode only. This project is a portfolio/demo application, not a production commerce platform for real customer data.
+- The Razorpay secret is used only by Vercel serverless functions and must remain in Vercel's encrypted environment variables.
 
-## Deployment note
+## Deployment
 
-Deploy `payment-server` as a separate Node service. Set `RAZORPAY_KEY_ID`, `RAZORPAY_KEY_SECRET`, `JSON_SERVER_URL`, and `FRONTEND_URL` in that service's private environment settings. In Vercel, set `VITE_PAYMENT_API_URL` to the deployed payment server URL and `VITE_RAZORPAY_KEY_ID` to the Test Key ID, then redeploy.
-
-This is a learning/demo integration. For real customers and production payments, use a secure backend and database rather than a browser-only JSON Server.
+The project is a standard Vite app on Vercel. API handlers live in the root `api/` directory and run as Vercel Serverless Functions. No Render service or external JSON Server is required for the browser-local demo flow.

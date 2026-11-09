@@ -4,6 +4,7 @@ import { Link } from "react-router-dom";
 
 import useCatalog from "../hooks/useCatalog";
 import { useCart } from "../context/CartContext";
+import { useAuth } from "../context/AuthContext";
 import { money } from "../../admin/utils/helpers";
 
 // --------------------------------------------------
@@ -14,13 +15,8 @@ const RAZORPAY_KEY_ID = (
   import.meta.env.VITE_RAZORPAY_KEY_ID || ""
 ).trim();
 
-// Development: localhost payment backend.
-// Production: same-origin Vercel rewrite by default.
-// You can optionally provide VITE_PAYMENT_API_URL.
-const PAYMENT_API = (
-  import.meta.env.VITE_PAYMENT_API_URL ||
-  (import.meta.env.DEV ? "http://localhost:5000" : "")
-).replace(/\/+$/, "");
+// Payment endpoints are same-origin Vercel Serverless Functions.
+const PAYMENT_API = "";
 
 // --------------------------------------------------
 // PAYMENT API HELPER
@@ -118,6 +114,7 @@ function loadRazorpayScript() {
 
 export default function Checkout() {
   const { cart, clearCart } = useCart();
+  const { user } = useAuth();
   const { products, loading } = useCatalog();
 
   const [form, setForm] = useState({
@@ -207,7 +204,7 @@ export default function Checkout() {
 
     const orderPayload = {
       id: `SS-${Date.now()}`,
-      customerId: "Guest",
+      customerId: user?.id || "Guest",
       date: new Date().toISOString().slice(0, 10),
       status: "Pending",
       total: orderTotal,

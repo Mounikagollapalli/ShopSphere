@@ -165,7 +165,7 @@ export default async function handler(req, res) {
   }
 
   try {
-    const action = String(req.query?.action || "");
+    const action = String(req.shopSphereAction || req.query?.action || "");
     if (action === "create-order") return await createOrder(req, res);
     if (action === "verify") return await verifyPayment(req, res);
     return send(res, 404, { ok: false, message: "Payment endpoint not found." });

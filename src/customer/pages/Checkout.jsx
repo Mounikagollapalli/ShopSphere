@@ -4,6 +4,7 @@ import { Link } from "react-router-dom";
 
 import useCatalog from "../hooks/useCatalog";
 import { useCart } from "../context/CartContext";
+import { useAuth } from "../context/AuthContext";
 import { money } from "../../admin/utils/helpers";
 
 // --------------------------------------------------
@@ -118,6 +119,7 @@ function loadRazorpayScript() {
 
 export default function Checkout() {
   const { cart, clearCart } = useCart();
+  const { user } = useAuth();
   const { products, loading } = useCatalog();
 
   const [form, setForm] = useState({
@@ -207,7 +209,7 @@ export default function Checkout() {
 
     const orderPayload = {
       id: `SS-${Date.now()}`,
-      customerId: "Guest",
+      customerId: user?.id || "Guest",
       date: new Date().toISOString().slice(0, 10),
       status: "Pending",
       total: orderTotal,
